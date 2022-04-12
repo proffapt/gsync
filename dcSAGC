@@ -1,0 +1,255 @@
+#!/bin/bash
+
+                  #########################################################################################################
+                  #                         dcSAGC - delete/create {SYNC, ALIAS, GITHUB, CONFIG} files                    #
+                  #                                                                                                       #
+                  #         Author: Arpit Bhardwaj(proffapt)                                                              #
+                  #         Twitter: @proffapt                                                                            #
+                  #         Github: proffapt                                                                              #
+                  #         Gitlab:  proffapt                                                                             #
+                  #         Instagram: I Don't Use That Shit                                                              #
+                  #         Facebook: I Don't Want My Data To Be Available On DarkWeb lol                                 #
+                  #         Email: proffapt@protonmail.com                                                                #
+                  #                                                                                                       #
+                  #               License: BSD License 2.0                                                                #
+                  #               Note: If You Find Any BUGS From dcSAGC, PLEASE REPORT IT TO ME!                         #
+                  #               Also Email Me If You Have Any Comments / Criticisms Or Suggestions - Thanks             #
+                  #                                                                                                       #
+                  ######################################################################################################### 
+
+## Colors :
+
+RED=`tput setaf 1`
+GREEN=`tput setaf 2`
+YELLOW=`tput setaf 3`
+BLUE=`tput setaf 4`
+PURPLE=`tput setaf 5`
+CYAN=`tput setaf 6`
+WHITE=`tput setaf 7`
+BLACK=`tput setaf 8`
+ORANGE=`tput setaf 9`
+RESET=$(tput sgr0)
+
+## Usage and arguments :
+
+USAGE="
+                  ##############################################################################################################
+                  #                         dcSAGC - delete/create {SYNC, ALIAS, GITHUB, CONFIG} files                         #
+                  #  Automate the unique process(by proffapt) of syncing your configuration from your local machine to github. #
+                  #                                                                                                            #
+                  #         Author: Arpit Bhardwaj(proffapt)                                                                   #
+                  #         Twitter: @proffapt                                                                                 #
+                  #         Github: proffapt                                                                                   #
+                  #         Gitlab: proffapt                                                                                   #
+                  #         Instagram: I Don't Use That Shit                                                                   #
+                  #         Facebook: I Don't Want My Data To Be Available On DarkWeb lol                                      #
+                  #         Email: proffapt@protonmail.com                                                                     #
+                  #                                                                                                            #
+                  #                  License: BSD License 2.0                                                                  #
+                  #                  Note: If You Find Any BUGS From dcSAGC, PLEASE REPORT IT TO ME!                           #
+                  #                  Also Email Me If You Have Any Comments / Criticisms Or Suggestions - Thanks               #
+                  #                                                                                                            #
+                  ############################################################################################################## 
+
+USAGE: $(basename "$0") [-m delete/create] [-s <sync_script_location>] [-a <name_of_alias>] [-g <git_main_folder>] [-c <config_file_location>]
+
+where:
+    -m : Specify the mode.. either delete or create.
+        create : starts the process of creation
+        delete : starts the process of deletion
+    -s : Enter full location(with name) of syncing script file
+    -a : Enter name for the alias to be used to edit the config file
+    -g : Enter full location(with name) of directory to be used as main for syncing
+    -c : Enter full location(with name) of configuration file
+    -h : Show this help message "
+
+while getopts m:s:a:g:c:h input
+do
+case "${input}"
+in
+m) MODE=${OPTARG};;
+s) SYNC_SCRIPT_location=${OPTARG};;
+a) ALIAS=${OPTARG};;
+g) GIT_MAIN_FOLDER_location=${OPTARG};;
+c) CONFIG_FILE_location=${OPTARG};;
+h) echo "${USAGE}" && exit 0 ;;
+*)  echo
+	echo "Invalid option: -$input" && exit 0 ;;
+esac
+done
+
+## Extracting names of files and folders from given location :
+
+SYNC_SCRIPT="${SYNC_SCRIPT_location##*/}"
+SYNC_SCRIPT_folder="${SYNC_SCRIPT_location%/*}"
+git_SYNC_SCRIPT_folder="$SYNC_SCRIPT_folder/.git" ## We got without a '/'
+IGIT_FOLDER="$GIT_MAIN_FOLDER_location.git" ## We got with a '/'
+CONFIG_FILE="${CONFIG_FILE_location##*/}"
+
+## Script execution location :
+
+CURRENT_LOCATION=$(pwd)
+
+## Creating the syncing files logic :
+
+if [[ $MODE == create ]]; then
+
+    if [[ ! -f "$CONFIG_FILE_location" ]]; then
+        nvim $CONFIG_FILE_location
+    else
+        echo -e "${GREEN}[+] ${WHITE}Configuration file already exists!"
+    fi
+
+    if [[ ! -d "$GIT_MAIN_FOLDER_location" ]]; then
+        mkdir $GIT_MAIN_FOLDER_location
+    else 
+        echo -e "${GREEN}[+] ${WHITE}Git local folder already exists!"
+    fi
+
+    if [[ ! -d "$IGIT_FOLDER" ]]; then
+
+        cd $GIT_MAIN_FOLDER_location
+        git init
+        read -p "$(echo -e "${GREEN}[*] ${BLUE}Enter the git repository link to be used as origin: ${RESET}")" ORIGIN
+        git remote add origin $ORIGIN
+
+        if [[ ! -f "README.md" ]]; then
+            nvim README.md
+        fi
+
+        git add .
+        git commit -m "adding README.md file"
+        git push origin main
+        cd $CURRENT_LOCATION
+
+    fi
+
+    if [[ ! -f "$GIT_MAIN_FOLDER_location$CONFIG_FILE" ]]; then
+    mv $CONFIG_FILE_location $GIT_MAIN_FOLDER_location
+    fi
+
+    if [[ ! -f "$CONFIG_FILE_location" ]]; then
+    ln -s $GIT_MAIN_FOLDER_location$CONFIG_FILE $CONFIG_FILE_location
+    fi
+
+    ## creating syncer script
+        
+    SHELL_LOCATION=$(echo $SHELL)
+    SHELL_TYPE="${SHELL_LOCATION##*/}"
+        
+    if [[ $SHELL_TYPE == fish ]]; then
+
+        echo "#!/opt/local/bin/fish
+
+cd $GIT_MAIN_FOLDER_location
+
+git add $CONFIG_FILE
+
+echo (set_color blue) '------------------' (set_color normal)
+echo (set_color red) 'COMMITTING UPDATE' (set_color normal)
+echo (set_color blue) '------------------' (set_color normal)
+
+git commit -m 'updating $CONFIG_FILE via shell script'
+
+echo (set_color blue) '------------------' (set_color normal)
+echo (set_color yellow) '  PUSHING UPDATE' (set_color normal)
+echo (set_color blue) '------------------' (set_color normal)
+
+git push -u origin main
+cd $(pwd)
+
+echo (set_color blue) '------------------' (set_color normal)
+echo (set_color green) 'SYNCED WITH GITHUB' (set_color normal)
+echo (set_color blue) '------------------' (set_color normal)" > $SYNC_SCRIPT_location
+
+        chmod +x $SYNC_SCRIPT_location
+
+        ## If the sync script's folder is related to some git repo.. then update the remote repo..
+        if [[ -d "$git_SYNC_SCRIPT_folder" ]]; then
+            cd $SYNC_SCRIPT_folder
+            git add $SYNC_SCRIPT
+            git commit -m "initial commit for $SYNC_SCRIPT"
+            git push -u origin main
+        fi
+
+        ## Updating the shell config file for the alias to edit(and update simultaneously) this config file
+        echo "  alias $ALIAS='nvim $CONFIG_FILE_location && $SYNC_SCRIPT_location'" >> ~/.config/fish/config.fish
+        source ~/.config/fish/config.fish
+        
+        ## This is the alias to my fish config syncer.. you might change it or remove it according to your case:
+        n-fish-ctgs
+
+    elif [[ $SHELL_TYPE == bash ]] || [[ $SHELL_TYPE == zsh ]]; then
+
+        echo "#!/bin/bash
+
+cd $GIT_MAIN_FOLDER_location 
+
+git add $CONFIG_FILE
+
+echo -e '\e[0;91m------------------\e[0m'
+echo -e '\e[0;91mCOMMITTING UPDATE\e[0m'
+echo -e '\e[0;94m------------------\e[0m'
+
+git commit -m 'updating $CONFIG_FILE via shell script'
+
+echo -e '\e[0;94m------------------\e[0m'
+echo -e '  \e[0;33mPUSHING UPDATE\e[0m'
+echo -e '\e[0;94m------------------\e[0m'
+
+git push -u origin main
+cd $(pwd)
+
+echo -e '\e[0;94m------------------\e[0m'
+echo -e '\e[0;92mSYNCED WITH GITHUB\e[0m'
+echo -e '\e[0;94m------------------\e[0m' " > $SYNC_SCRIPT_location
+        
+        chmod +x $SYNC_SCRIPT_location
+
+        ## If the sync script's folder is related to some git repo.. then update the remote repo..
+        if [[ -d "$git_SYNC_SCRIPT_folder" ]]; then
+            cd $SYNC_SCRIPT_folder
+            git add $SYNC_SCRIPT 
+            git commit -m "initial commit for $SYNC_SCRIPT"
+            git push -u origin main
+        fi
+
+        SHELL_file="${SHELL_TYPE}rc"
+        echo " " >> ~/.$SHELL_file
+        echo "  alias $ALIAS='nvim $CONFIG_FILE_location && $SYNC_SCRIPT_location'" >> ~/.$SHELL_file
+        source ~/.$SHELL_file
+
+    fi
+
+    ## Syncing the configuration file added in it's git folder using just created sync scripts..
+    $SYNC_SCRIPT_location
+
+elif [[ $MODE == delete ]]; then
+
+    if [[ -f "$CONFIG_FILE_location" ]]; then
+        rm $CONFIG_FILE_location
+    else
+        echo -e "${RED}[+] ${WHITE}Configuration link file doesn't exist!"
+    fi
+
+    echo -e "${GREEN}[+] ${WHITE}Establishing original file back to it's expected location.."
+    cp $GIT_MAIN_FOLDER_location$CONFIG_FILE $CONFIG_FILE_location
+
+    if [[ -f "$GIT_MAIN_FOLDER_location$CONFIG_FILE" ]]; then
+        rm -rf $GIT_MAIN_FOLDER_location
+    else
+        echo -e "${RED}[+] ${WHITE}Git folder containing configuration file doesn't exist!"
+    fi
+    
+    if [[ -f "$SYNC_FILE_location" ]]; then
+        rm $SYNC_FILE_location
+    else
+        echo -e "${RED}[+] ${WHITE}Configuration syncer script doesn't exist!"
+    fi
+
+else 
+
+    echo -e "${RED}ERROR${WHITE}: Invalid mode selected - '${ORANGE}$1${WHITE}'"
+    echo -e "${RED}[+] ${WHITE}Exitting the tool.."
+
+fi
