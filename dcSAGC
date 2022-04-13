@@ -95,41 +95,70 @@ CURRENT_LOCATION=$(pwd)
 if [[ $MODE == create ]]; then
 
     if [[ ! -f "$CONFIG_FILE_location" ]]; then
+        echo -e "${GREEN}[+] ${BLUE}Creating configuration file${WHITE}"
         nvim $CONFIG_FILE_location
     else
-        echo -e "${GREEN}[+] ${WHITE}Configuration file already exists!"
+        echo -e "${YELLOW}[-] ${BLUE}Configuration file already exists!${WHITE}"
     fi
 
     if [[ ! -d "$GIT_MAIN_FOLDER_location" ]]; then
+        echo -e "${GREEN}[+] ${BLUE}Creating local git folder${WHITE}"
         mkdir $GIT_MAIN_FOLDER_location
     else 
-        echo -e "${GREEN}[+] ${WHITE}Git local folder already exists!"
+        echo -e "${YELLOW}[-] ${BLUE}Local git folder already exists!${WHITE}"
     fi
 
     if [[ ! -d "$IGIT_FOLDER" ]]; then
 
+        echo -e "${GREEN}[+] ${BLUE}Initialising git in the GIT folder${WHITE}"
         cd $GIT_MAIN_FOLDER_location
         git init
-        read -p "$(echo -e "${GREEN}[*] ${BLUE}Enter the git repository link to be used as origin: ${RESET}")" ORIGIN
+        read -p "$(echo -e "${GREEN}[*] ${CYAN}Enter the git repository link to be used as origin: ${WHITE}")" ORIGIN
         git remote add origin $ORIGIN
 
         if [[ ! -f "README.md" ]]; then
+            echo -e "${GREEN}[+] ${BLUE}Creating README.md file in the git folder${WHITE}"
+
             nvim README.md
+            git add .
+            git commit -m "adding README.md file and config file"
+            git push origin main
+            cd $CURRENT_LOCATION
+        else
+            echo -e "${YELLOW}[-] ${BLUE}README.md file already exists in the git folder!${WHITE}"
         fi
 
-        git add .
-        git commit -m "adding README.md file"
-        git push origin main
-        cd $CURRENT_LOCATION
+        echo -e "${GREEN}[+] ${BLUE}Git successfully initialised in the git folder${WHITE}"
+    else
+        echo -e "${YELLOW}[-] ${BLUE}Git is already initialised in the git folder!${WHITE}"
+
+        cd $GIT_MAIN_FOLDER_location
+        if [[ ! -f "README.md" ]]; then
+            echo -e "${GREEN}[+] ${BLUE}Creating README.md file in the git folder${WHITE}"
+            
+            nvim README.md
+            git add .
+            git commit -m "adding README.md file and config file"
+            git push origin main
+            cd $CURRENT_LOCATION
+        else
+            echo -e "${YELLOW}[-] ${BLUE}README.md file already exists in the git folder!${WHITE}"
+        fi
 
     fi
 
     if [[ ! -f "$GIT_MAIN_FOLDER_location$CONFIG_FILE" ]]; then
-    mv $CONFIG_FILE_location $GIT_MAIN_FOLDER_location
+        echo -e "${GREEN}[+] ${BLUE}Moving the config file to git folder${WHITE}"
+        mv $CONFIG_FILE_location $GIT_MAIN_FOLDER_location
+    else
+        echo -e "${YELLOW}[-] ${BLUE}Config already exist in the git folder${WHITE}"
     fi
 
     if [[ ! -f "$CONFIG_FILE_location" ]]; then
-    ln -s $GIT_MAIN_FOLDER_location$CONFIG_FILE $CONFIG_FILE_location
+        echo -e "${GREEN}[+] ${BLUE}Creating link at config location from config file in git folder${WHITE}"
+        ln -s $GIT_MAIN_FOLDER_location$CONFIG_FILE $CONFIG_FILE_location
+    else
+        echo -e "${YELLOW}[-] ${BLUE}Link already exist in config location${WHITE}"
     fi
 
     ## creating syncer script
@@ -139,10 +168,15 @@ if [[ $MODE == create ]]; then
         
     if [[ $SHELL_TYPE == fish ]]; then
 
-        echo "#!/opt/local/bin/fish
+        if [[ ! -f "$SYNC_SCRIPT_location" ]]; then
+
+            echo -e "${GREEN}[+] ${BLUE}Creating sync script${WHITE}"
+
+            echo "#!/opt/local/bin/fish
+
+set CURR_LOCATION \$(pwd)
 
 cd $GIT_MAIN_FOLDER_location
-
 git add $CONFIG_FILE
 
 echo (set_color blue) '------------------' (set_color normal)
@@ -156,35 +190,58 @@ echo (set_color yellow) '  PUSHING UPDATE' (set_color normal)
 echo (set_color blue) '------------------' (set_color normal)
 
 git push -u origin main
-cd $(pwd)
+cd \$CURR_LOCATION
 
 echo (set_color blue) '------------------' (set_color normal)
 echo (set_color green) 'SYNCED WITH GITHUB' (set_color normal)
 echo (set_color blue) '------------------' (set_color normal)" > $SYNC_SCRIPT_location
 
-        chmod +x $SYNC_SCRIPT_location
+            chmod +x $SYNC_SCRIPT_location
 
-        ## If the sync script's folder is related to some git repo.. then update the remote repo..
-        if [[ -d "$git_SYNC_SCRIPT_folder" ]]; then
-            cd $SYNC_SCRIPT_folder
-            git add $SYNC_SCRIPT
-            git commit -m "initial commit for $SYNC_SCRIPT"
-            git push -u origin main
+            ## If the sync script's folder is related to some git repo.. then update the remote repo..
+            if [[ -d "$git_SYNC_SCRIPT_folder" ]]; then
+                echo -e "${GREEN}[+] ${BLUE}Syncing the git folder${WHITE}"
+
+                cd $SYNC_SCRIPT_folder
+                git add $SYNC_SCRIPT
+                git commit -m "initial commit for $SYNC_SCRIPT"
+                git push -u origin main
+            else
+                echo -e "${RED}[!] ${BLUE}The git folder for sync file isn't initialised${WHITE}"
+            fi
+
+            ## Updating the shell config file for the alias to edit(and update simultaneously) this config file
+            echo -e "${GREEN}[+] ${BLUE}Adding the alias to shell config file${WHITE}"
+
+            echo "alias $ALIAS='nvim $CONFIG_FILE_location && $SYNC_SCRIPT_location'" >> ~/.config/fish/config.fish
+
+            echo
+            echo -e "${CYAN}[^] ${YELLOW}Source the shell config after running the script..${WHITE}"
+            echo
+            
+            ## This is the alias to my fish config syncer.. you might change it or remove it according to your case:
+            echo -e "${GREEN}[+] ${BLUE}Syncing the shell config file${WHITE}"
+            n-fish-ctgs
+
+            ## Syncing the configuration file added in it's git folder using just created sync scripts..
+            echo -e "${GREEN}[+] ${BLUE}Syncing the configuration file to github"
+            $SYNC_SCRIPT_location
+
+        else
+            echo -e "${YELLOW}[-] ${BLUE}Sync file already exist${WHITE}"
         fi
-
-        ## Updating the shell config file for the alias to edit(and update simultaneously) this config file
-        echo "  alias $ALIAS='nvim $CONFIG_FILE_location && $SYNC_SCRIPT_location'" >> ~/.config/fish/config.fish
-        source ~/.config/fish/config.fish
-        
-        ## This is the alias to my fish config syncer.. you might change it or remove it according to your case:
-        n-fish-ctgs
 
     elif [[ $SHELL_TYPE == bash ]] || [[ $SHELL_TYPE == zsh ]]; then
 
-        echo "#!/bin/bash
+        if [[ ! -f "$SYNC_SCRIPT_location" ]]; then
+
+            echo -e "${GREEN}[+] ${BLUE}Creating sync script${WHITE}"
+
+            echo "#!/bin/bash
+
+CURR_LOCATION=\$(pwd)
 
 cd $GIT_MAIN_FOLDER_location 
-
 git add $CONFIG_FILE
 
 echo -e '\e[0;91m------------------\e[0m'
@@ -198,58 +255,70 @@ echo -e '  \e[0;33mPUSHING UPDATE\e[0m'
 echo -e '\e[0;94m------------------\e[0m'
 
 git push -u origin main
-cd $(pwd)
+cd \$CURR_LOCATION
 
 echo -e '\e[0;94m------------------\e[0m'
 echo -e '\e[0;92mSYNCED WITH GITHUB\e[0m'
 echo -e '\e[0;94m------------------\e[0m' " > $SYNC_SCRIPT_location
-        
-        chmod +x $SYNC_SCRIPT_location
+            
+            chmod +x $SYNC_SCRIPT_location
 
-        ## If the sync script's folder is related to some git repo.. then update the remote repo..
-        if [[ -d "$git_SYNC_SCRIPT_folder" ]]; then
-            cd $SYNC_SCRIPT_folder
-            git add $SYNC_SCRIPT 
-            git commit -m "initial commit for $SYNC_SCRIPT"
-            git push -u origin main
+            ## If the sync script's folder is related to some git repo.. then update the remote repo..
+            if [[ -d "$git_SYNC_SCRIPT_folder" ]]; then
+                echo -e "${GREEN}[+] ${BLUE}Syncing the git folder${WHITE}"
+
+                cd $SYNC_SCRIPT_folder
+                git add $SYNC_SCRIPT 
+                git commit -m "initial commit for $SYNC_SCRIPT"
+                git push -u origin main
+            else
+                echo -e "${RED}[!] ${BLUE}The git folder for sync file isn't initialised${WHITE}"
+            fi
+
+            echo -e "${GREEN}[+] ${BLUE}Adding the alias to shell config file and sourcing it${WHITE}"
+            
+            SHELL_file="${SHELL_TYPE}rc"
+            echo " " >> ~/.$SHELL_file
+            echo "  alias $ALIAS='nvim $CONFIG_FILE_location && $SYNC_SCRIPT_location'" >> ~/.$SHELL_file
+            source ~/.$SHELL_file
+
+            ## Syncing the configuration file added in it's git folder using just created sync scripts..
+            echo -e "${GREEN}[+] ${BLUE}Syncing the configuration file to github"
+            $SYNC_SCRIPT_location
+
+        else
+            echo -e "${YELLOW}[-] ${BLUE}Sync file already exist${WHITE}"
         fi
 
-        SHELL_file="${SHELL_TYPE}rc"
-        echo " " >> ~/.$SHELL_file
-        echo "  alias $ALIAS='nvim $CONFIG_FILE_location && $SYNC_SCRIPT_location'" >> ~/.$SHELL_file
-        source ~/.$SHELL_file
-
     fi
-
-    ## Syncing the configuration file added in it's git folder using just created sync scripts..
-    $SYNC_SCRIPT_location
 
 elif [[ $MODE == delete ]]; then
 
     if [[ -f "$CONFIG_FILE_location" ]]; then
+        echo -e "${GREEN}[+] ${BLUE}Removing link of configuration file${WHITE}"
         rm $CONFIG_FILE_location
     else
-        echo -e "${RED}[+] ${WHITE}Configuration link file doesn't exist!"
+        echo -e "${RED}[!] ${BLUE}Configuration link file doesn't exist!${WHITE}"
     fi
 
-    echo -e "${GREEN}[+] ${WHITE}Establishing original file back to it's expected location.."
+    echo -e "${GREEN}[+] ${BLUE}Putting original file back to it's expected location..${WHITE}"
     cp $GIT_MAIN_FOLDER_location$CONFIG_FILE $CONFIG_FILE_location
 
     if [[ -f "$GIT_MAIN_FOLDER_location$CONFIG_FILE" ]]; then
         rm -rf $GIT_MAIN_FOLDER_location
     else
-        echo -e "${RED}[+] ${WHITE}Git folder containing configuration file doesn't exist!"
+        echo -e "${RED}[!] ${BLUE}Git folder containing configuration file doesn't exist!${WHITE}"
     fi
     
     if [[ -f "$SYNC_FILE_location" ]]; then
         rm $SYNC_FILE_location
     else
-        echo -e "${RED}[+] ${WHITE}Configuration syncer script doesn't exist!"
+        echo -e "${RED}[!] ${BLUE}Configuration syncer script doesn't exist!${WHITE}"
     fi
 
 else 
 
     echo -e "${RED}ERROR${WHITE}: Invalid mode selected - '${ORANGE}$1${WHITE}'"
-    echo -e "${RED}[+] ${WHITE}Exitting the tool.."
+    echo -e "${RED}[!] ${WHITE}Exitting the tool.."
 
 fi
