@@ -224,7 +224,7 @@ echo (set_color blue) '------------------' (set_color normal)" > $SYNC_SCRIPT_lo
             n-fish-ctgs
 
             ## Syncing the configuration file added in it's git folder using just created sync scripts..
-            echo -e "${GREEN}[+] ${BLUE}Syncing the configuration file to github"
+            echo -e "${GREEN}[+] ${BLUE}Syncing the configuration file to github${WHITE}"
             $SYNC_SCRIPT_location
 
         else
@@ -283,7 +283,7 @@ echo -e '\e[0;94m------------------\e[0m' " > $SYNC_SCRIPT_location
             source ~/.$SHELL_file
 
             ## Syncing the configuration file added in it's git folder using just created sync scripts..
-            echo -e "${GREEN}[+] ${BLUE}Syncing the configuration file to github"
+            echo -e "${GREEN}[+] ${BLUE}Syncing the configuration file to github${WHITE}"
             $SYNC_SCRIPT_location
 
         else
