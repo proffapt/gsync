@@ -262,7 +262,7 @@ Project Link: [https://github.com/proffapt/dcSAGC](https://github.com/proffapt/d
 [issues-shield]: https://img.shields.io/github/issues/proffapt/dcSAGC.svg?style=for-the-badge
 [issues-url]: https://github.com/proffapt/dcSAGC/issues
 [license-shield]: https://img.shields.io/github/license/proffapt/dcSAGC.svg?style=for-the-badge
-[license-url]: https://github.com/proffapt/dcSAGC/blob/master/LICENSE.txt
+[license-url]: https://github.com/proffapt/dcSAGC/blob/main/LICENSE.txt
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
 [linkedin-url]: https://linkedin.com/in/proffapt
 [product-screenshot]: .images/screenshot.png
