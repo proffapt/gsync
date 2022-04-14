@@ -242,7 +242,7 @@ echo (set_color blue) '------------------' (set_color normal)" > $SYNC_SCRIPT_lo
                 git commit -m "initial commit for $SYNC_SCRIPT"
                 git push -u origin main
             else
-                echo -e "${RED}[!] ${BLUE}The git folder for sync file isn't initialised${WHITE}"
+                echo -e "${YELLOW}[-] ${BLUE}The git folder for sync file isn't initialised${WHITE}"
             fi
 
             ## Updating the shell config file for the alias to edit(and update simultaneously) this config file
@@ -307,7 +307,7 @@ echo -e '\e[0;94m------------------\e[0m' " > $SYNC_SCRIPT_location
                 git commit -m "initial commit for $SYNC_SCRIPT"
                 git push -u origin main
             else
-                echo -e "${RED}[!] ${BLUE}The git folder for sync file isn't initialised${WHITE}"
+                echo -e "${YELLOW}[-] ${BLUE}The git folder for sync file isn't initialised${WHITE}"
             fi
 
             echo -e "${GREEN}[+] ${BLUE}Adding the alias to shell config file and sourcing it${WHITE}"
@@ -319,7 +319,7 @@ echo -e '\e[0;94m------------------\e[0m' " > $SYNC_SCRIPT_location
             elif [[ $SHELL_TYPE == zsh ]]; then
 
                 SHELL_file=~/.zshrc
-                
+
             fi
 
             echo "alias $ALIAS='nvim $CONFIG_FILE_location && $SYNC_SCRIPT_location'" >> $SHELL_file
