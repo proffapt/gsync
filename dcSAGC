@@ -312,11 +312,11 @@ echo -e '\e[0;94m------------------\e[0m' " > $SYNC_SCRIPT_location
 
             echo -e "${GREEN}[+] ${BLUE}Adding the alias to shell config file and sourcing it${WHITE}"
             
-            SHELL_file="${SHELL_TYPE}rc"
-            echo "alias $ALIAS='nvim $CONFIG_FILE_location && $SYNC_SCRIPT_location'" >> ~/.$SHELL_file
+            SHELL_file="~/.${SHELL_TYPE}rc"
+            echo "alias $ALIAS='nvim $CONFIG_FILE_location && $SYNC_SCRIPT_location'" >> $SHELL_file
 
             if [[ $SHELL_TYPE == bash ]]; then
-                source ~/.$SHELL_file
+                source $SHELL_file
             elif [[ $SHELL_TYPE == zsh ]]; then
                 echo
                 echo -e "${CYAN}[^] ${YELLOW}Source the shell config after running the script..${WHITE}"
@@ -402,7 +402,7 @@ elif [[ $MODE == delete ]]; then
 
     elif [[ $SHELL_TYPE == bash ]] || [[ $SHELL_TYPE == zsh ]]; then
 
-        SHELL_file="${SHELL_TYPE}rc"
+        SHELL_file="~/.${SHELL_TYPE}rc"
 
     else
         echo -e "${RED}ERROR${WHITE}: You are using unsupported shell type! - '${ORANGE}$SHELL_TYPE${WHITE}'"
