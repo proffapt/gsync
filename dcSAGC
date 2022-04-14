@@ -80,6 +80,8 @@ done
 
 ## Extracting names of files and folders from given location :
 
+SHELL_LOCATION=$(echo $SHELL)
+SHELL_TYPE="${SHELL_LOCATION##*/}"
 SYNC_SCRIPT="${SYNC_SCRIPT_location##*/}"
 SYNC_SCRIPT_folder="${SYNC_SCRIPT_location%/*}"
 git_SYNC_SCRIPT_folder="$SYNC_SCRIPT_folder/.git" ## We got without a '/'
@@ -114,6 +116,10 @@ if [[ $MODE == create ]]; then
         cd $GIT_MAIN_FOLDER_location
         git init
         read -p "$(echo -e "${GREEN}[*] ${CYAN}Enter the git repository link to be used as origin: ${WHITE}")" ORIGIN
+        read -p "$(echo -e "${GREEN}[*] ${CYAN}Specify the visibility to set for repo [public/private]: ${WHITE}")" VISIBILITY
+
+        echo -e "${GREEN}[+] ${BLUE}Creating repository on github..${WHITE}"
+        gh repo create $ORIGIN --$VISIBILITY --description "Git repo for syncing $CONFIG_FILE in real-time"
         git remote add origin $ORIGIN
 
         if [[ ! -f "README.md" ]]; then
@@ -162,9 +168,6 @@ if [[ $MODE == create ]]; then
     fi
 
     ## creating syncer script
-        
-    SHELL_LOCATION=$(echo $SHELL)
-    SHELL_TYPE="${SHELL_LOCATION##*/}"
         
     if [[ $SHELL_TYPE == fish ]]; then
 
@@ -219,7 +222,7 @@ echo (set_color blue) '------------------' (set_color normal)" > $SYNC_SCRIPT_lo
             echo -e "${CYAN}[^] ${YELLOW}Source the shell config after running the script..${WHITE}"
             echo
             
-            ## This is the alias to my fish config syncer.. you might change it or remove it according to your case:
+            ## This is the alias to my fish config syncer.. MODIFY_IT according to yourself!:
             echo -e "${GREEN}[+] ${BLUE}Syncing the shell config file${WHITE}"
             n-fish-ctgs
 
@@ -278,9 +281,15 @@ echo -e '\e[0;94m------------------\e[0m' " > $SYNC_SCRIPT_location
             echo -e "${GREEN}[+] ${BLUE}Adding the alias to shell config file and sourcing it${WHITE}"
             
             SHELL_file="${SHELL_TYPE}rc"
-            echo " " >> ~/.$SHELL_file
-            echo "  alias $ALIAS='nvim $CONFIG_FILE_location && $SYNC_SCRIPT_location'" >> ~/.$SHELL_file
-            source ~/.$SHELL_file
+            echo "alias $ALIAS='nvim $CONFIG_FILE_location && $SYNC_SCRIPT_location'" >> ~/.$SHELL_file
+
+            if [[ $SHELL_TYPE == bash ]]; then
+                source ~/.$SHELL_file
+            elif [[ $SHELL_TYPE == zsh ]]; then
+                echo
+                echo -e "${CYAN}[^] ${YELLOW}Source the shell config after running the script..${WHITE}"
+                echo
+            fi
 
             ## Syncing the configuration file added in it's git folder using just created sync scripts..
             echo -e "${GREEN}[+] ${BLUE}Syncing the configuration file to github${WHITE}"
@@ -289,36 +298,117 @@ echo -e '\e[0;94m------------------\e[0m' " > $SYNC_SCRIPT_location
         else
             echo -e "${YELLOW}[-] ${BLUE}Sync file already exist${WHITE}"
         fi
-
+    else
+        echo -e "${RED}ERROR${WHITE}: You are using unsupported shell type! - '${ORANGE}$SHELL_TYPE${WHITE}'"
+        echo -e "${RED}[!] ${WHITE}Exitting the tool.."
     fi
 
 elif [[ $MODE == delete ]]; then
 
+    ## Removing link 
     if [[ -f "$CONFIG_FILE_location" ]]; then
-        echo -e "${GREEN}[+] ${BLUE}Removing link of configuration file${WHITE}"
-        rm $CONFIG_FILE_location
+        if [[ -L "$CONFIG_FILE_location" ]]; then
+            echo -e "${GREEN}[+] ${BLUE}Removing link of configuration file${WHITE}"
+            rm $CONFIG_FILE_location
+        else
+            echo -e "${YELLOW}[-] ${BLUE}This file at configuration location is not a link!${WHITE}"
+        fi   
     else
-        echo -e "${RED}[!] ${BLUE}Configuration link file doesn't exist!${WHITE}"
+        echo -e "${YELLOW}[-] ${BLUE}Configuration link file doesn't exist!${WHITE}"
     fi
 
-    echo -e "${GREEN}[+] ${BLUE}Putting original file back to it's expected location..${WHITE}"
-    cp $GIT_MAIN_FOLDER_location$CONFIG_FILE $CONFIG_FILE_location
-
+    ## Placing original configuration file
     if [[ -f "$GIT_MAIN_FOLDER_location$CONFIG_FILE" ]]; then
+        echo -e "${GREEN}[+] ${BLUE}Putting original file back to it's expected location..${WHITE}"
+        cp $GIT_MAIN_FOLDER_location$CONFIG_FILE $CONFIG_FILE_location
+    else
+        echo -e "${YELLOW}[-] ${BLUE}Configuration file doesn't exist in the specified location${WHITE}"
+    fi
+
+    ## Handling the sync script in local and remote repo
+    if [[ -f "$SYNC_SCRIPT_location" ]]; then
+        echo -e "${GREEN}[+] ${BLUE}Removing sync script from your local machine${WHITE}"
+        rm $SYNC_SCRIPT_location
+
+        if [[ -d "$git_SYNC_SCRIPT_folder" ]]; then
+            echo -e "${GREEN}[+] ${BLUE}Updating the github repo syncing the sync scripts${WHITE}"
+            cd $SYNC_SCRIPT_folder
+
+            git add .
+            git commit -m "Removing $SYNC_SCRIPT as commanded by dcSAGC"
+            git push -u origin main
+            cd $CURRENT_LOCATION
+        else
+            echo -e "${YELLOW}[-] ${BLUE}Sync script is not being synced with any github repo${WHITE}"
+        fi
+
+    else
+        echo -e "${YELLOW}[-] ${BLUE}Configuration syncer script doesn't exist!${WHITE}"
+    fi
+
+    ## Handling the config file in git folder
+    if [[ -f "$GIT_MAIN_FOLDER_location$CONFIG_FILE" ]]; then
+        echo -e "${GREEN}[+] ${BLUE}Deleting the github repository git folder containing config file${WHITE}"
+        cd $GIT_MAIN_FOLDER_location
+        gh repo delete --confirm
+        cd $CURRENT_LOCATION
+
+        echo -e "${GREEN}[+] ${BLUE}Deleting the config file from your local machine${WHITE}"
         rm -rf $GIT_MAIN_FOLDER_location
     else
-        echo -e "${RED}[!] ${BLUE}Git folder containing configuration file doesn't exist!${WHITE}"
+        echo -e "${YELLOW}[-] ${BLUE}Git folder containing configuration file doesn't exist!${WHITE}"
     fi
-    
-    if [[ -f "$SYNC_FILE_location" ]]; then
-        rm $SYNC_FILE_location
+
+    ## Handling alias added into the config file
+
+    if [[ $SHELL_TYPE == fish ]]; then
+
+        SHELL_file=~/.config/fish/config.fish
+
+    elif [[ $SHELL_TYPE == bash ]] || [[ $SHELL_TYPE == zsh ]]; then
+
+        SHELL_file="${SHELL_TYPE}rc"
+
     else
-        echo -e "${RED}[!] ${BLUE}Configuration syncer script doesn't exist!${WHITE}"
+        echo -e "${RED}ERROR${WHITE}: You are using unsupported shell type! - '${ORANGE}$SHELL_TYPE${WHITE}'"
+        echo -e "${RED}[!] ${WHITE}Exitting the tool.."
+
+        exit 0
+    fi
+
+    ALIAS_TEST=$(cat $SHELL_file | grep -q $ALIAS= && echo 69)
+
+    if [[ $ALIAS_TEST == 69 ]]; then
+        echo -e "${GREEN}[+] ${BLUE}Removing the alias added earlier..${WHITE}"
+        KERNEL=$(uname -s)
+
+        if [[ $KERNEL == Darwin ]]; then
+            ## Using this method to edit links also.. incase your configuration file is a link itself!
+            if [[ -L "$SHELL_file" ]]; then
+                SHELL_CONFIG=$(readlink $SHELL_file)
+                sed -i '' "/alias $ALIAS/d" $SHELL_CONFIG
+            else
+                sed -i '' "/alias $ALIAS/d" $SHELL_file
+            fi
+        else
+            ## Using this method to edit links also.. incase your configuration file is a link itself!
+            if [[ -L "$SHELL_file" ]]; then
+                SHELL_CONFIG=$(readlink $SHELL_file)
+                sed -i "/alias $ALIAS/d" $SHELL_CONFIG
+            else
+                sed -i "/alias $ALIAS/d" $SHELL_file
+            fi
+        fi
+
+        ## Syncing config file with github.. MODIFY_IT according to yourself!
+        n-fish-ctgs
+    else
+        echo -e "${YELLOW}[-] ${BLUE}Aliases doesn't exist in shell config file!${WHITE}"
     fi
 
 else 
-
     echo -e "${RED}ERROR${WHITE}: Invalid mode selected - '${ORANGE}$1${WHITE}'"
-    echo -e "${RED}[!] ${WHITE}Exitting the tool.."
+    echo -e "${RED}[!] ${WHITE}Exitting the tool..${WHITE}"
 
+    exit 0
 fi
