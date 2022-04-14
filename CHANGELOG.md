@@ -7,7 +7,7 @@
 - Added the logic for delete mode
 - Beautified usage output
 - Added Banner
-- Creating setup.sh
+- Adding final documentation
 
 ### Removed
 
