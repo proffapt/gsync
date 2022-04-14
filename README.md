@@ -85,7 +85,7 @@ To get a local copy up and running follow these simple steps.
 You will need to install the following dependencies for the project to work.
 * `git`
   ```sh
-  git confing --gloabl init.defaultBranch main
+  git confing --global init.defaultBranch main
   git config --global user.name "<enter_your_value>"
   git config --global user.email "<add_your_mail>"
   git config pull.rebase false
