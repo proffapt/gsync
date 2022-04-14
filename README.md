@@ -86,8 +86,8 @@ You will need to install the following dependencies for the project to work.
 * `git`
   ```sh
   git cofing --gloabl init.defaultBranch main
-  git config --user.name "<enter_your_value>"
-  git config --user.email "<add_your_mail>"
+  git config --global user.name "<enter_your_value>"
+  git config --global user.email "<add_your_mail>"
   git config pull.rebase false
   git config credential.helper store
   ```
