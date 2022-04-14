@@ -1,21 +1,22 @@
 #!/bin/bash
 
-                  #########################################################################################################
-                  #                         dcSAGC - delete/create {SYNC, ALIAS, GITHUB, CONFIG} files                    #
-                  #                                                                                                       #
-                  #         Author: Arpit Bhardwaj(proffapt)                                                              #
-                  #         Twitter: @proffapt                                                                            #
-                  #         Github: proffapt                                                                              #
-                  #         Gitlab:  proffapt                                                                             #
-                  #         Instagram: I Don't Use That Shit                                                              #
-                  #         Facebook: I Don't Want My Data To Be Available On DarkWeb lol                                 #
-                  #         Email: proffapt@protonmail.com                                                                #
-                  #                                                                                                       #
-                  #               License: BSD License 2.0                                                                #
-                  #               Note: If You Find Any BUGS From dcSAGC, PLEASE REPORT IT TO ME!                         #
-                  #               Also Email Me If You Have Any Comments / Criticisms Or Suggestions - Thanks             #
-                  #                                                                                                       #
-                  ######################################################################################################### 
+              ###############################################################################################################
+              #                          dcSAGC - delete/create {SYNC, ALIAS, GITHUB, CONFIG} files                         #
+              #  Automate the unique process(by proffapt) for syncing your configuration from your local machine to github. #
+              #                                                                                                             #
+              #         Author: Arpit Bhardwaj(proffapt)                                                                    #
+              #         Twitter: @proffapt                                                                                  #
+              #         Github: proffapt                                                                                    #
+              #         Gitlab: proffapt                                                                                    #
+              #         Instagram: I Don't Use That Shit                                                                    #
+              #         Facebook: I Don't Want My Data To Be Available On DarkWeb lol                                       #
+              #         Email: proffapt@protonmail.com                                                                      #
+              #                                                                                                             #
+              #                  License: BSD License 2.0                                                                   #
+              #                  Note: If You Find Any BUGS From dcSAGC, PLEASE REPORT IT TO ME!                            #
+              #                  Also Email Me If You Have Any Comments / Criticisms Or Suggestions - Thanks                #
+              #                                                                                                             #
+              ############################################################################################################### 
 
 ## Colors :
 
@@ -32,36 +33,44 @@ RESET=$(tput sgr0)
 
 ## Usage and arguments :
 
-USAGE="
-                  ##############################################################################################################
-                  #                         dcSAGC - delete/create {SYNC, ALIAS, GITHUB, CONFIG} files                         #
-                  #  Automate the unique process(by proffapt) of syncing your configuration from your local machine to github. #
-                  #                                                                                                            #
-                  #         Author: Arpit Bhardwaj(proffapt)                                                                   #
-                  #         Twitter: @proffapt                                                                                 #
-                  #         Github: proffapt                                                                                   #
-                  #         Gitlab: proffapt                                                                                   #
-                  #         Instagram: I Don't Use That Shit                                                                   #
-                  #         Facebook: I Don't Want My Data To Be Available On DarkWeb lol                                      #
-                  #         Email: proffapt@protonmail.com                                                                     #
-                  #                                                                                                            #
-                  #                  License: BSD License 2.0                                                                  #
-                  #                  Note: If You Find Any BUGS From dcSAGC, PLEASE REPORT IT TO ME!                           #
-                  #                  Also Email Me If You Have Any Comments / Criticisms Or Suggestions - Thanks               #
-                  #                                                                                                            #
-                  ############################################################################################################## 
+USAGE="$(clear)
+              #############################################################################################
+              #                  ${YELLOW}dcSAGC${WHITE} - ${BLUE}delete/create {SYNC, ALIAS, GITHUB, CONFIG} files${WHITE}               #
+              #                                                                                           #
+              #    ${GREEN}Author${WHITE}: ${CYAN}Arpit Bhardwaj(proffapt)${WHITE}                                                       #
+              #    ${GREEN}Twitter${WHITE}: ${CYAN}@proffapt${WHITE}                                                                     #
+              #    ${GREEN}Github${WHITE}: ${CYAN}proffapt${WHITE}                                                                       #
+              #    ${GREEN}Gitlab${WHITE}: ${CYAN}proffapt${WHITE}                                                                       #
+              #    ${GREEN}Instagram${WHITE}: ${ORANGE}I Don't Use That Shit${WHITE}                                                       #
+              #    ${GREEN}Facebook${WHITE}: ${ORANGE}I Don't Want My Data To Be Available On DarkWeb lol${WHITE}                          #
+              #    ${GREEN}Email${WHITE}: ${CYAN}proffapt@protonmail.com${WHITE}                                                         #
+              #                                                                                           #
+              #           ${GREEN}License${WHITE}: ${CYAN}BSD License 2.0${WHITE}                                                        #
+              #           ${RED}Note:${WHITE} ${PURPLE}If You Find Any BUGS From dcSAGC, PLEASE REPORT IT TO ME!${WHITE}                 #
+              #           ${PURPLE}Also Email Me If You Have Any Comments / Criticisms Or Suggestions - Thanks${WHITE}     #
+              #                                                                                           #
+              ############################################################################################# 
 
-USAGE: $(basename "$0") [-m delete/create] [-s <sync_script_location>] [-a <name_of_alias>] [-g <git_main_folder>] [-c <config_file_location>]
+              ${YELLOW}Automate the unique process for syncing your configuration from your local machine to github.${WHITE}
 
-where:
-    -m : Specify the mode.. either delete or create.
-        create : starts the process of creation
-        delete : starts the process of deletion
-    -s : Enter full location(with name) of syncing script file
-    -a : Enter name for the alias to be used to edit the config file
-    -g : Enter full location(with name) of directory to be used as main for syncing
-    -c : Enter full location(with name) of configuration file
-    -h : Show this help message "
+${BLUE}USAGE:${WHITE} $(basename "$0") [${RED}-m${WHITE} ${CYAN}delete/create${WHITE}] [${RED}-s${WHITE} ${CYAN}<sync_script_location>${WHITE}] [${RED}-a${WHITE} ${CYAN}<name_of_alias>${WHITE}] [${RED}-g${WHITE} ${CYAN}<git_main_folder>${WHITE}] [${RED}-c${WHITE} ${CYAN}<config_file_location>${WHITE}]
+
+${BLUE}where:${WHITE}
+    ${RED}-m${WHITE} : Specify the mode.. of operation for the tool
+         ${CYAN}create${WHITE} : starts the process of creation
+         ${CYAN}delete${WHITE} : starts the process of deletion
+    ${RED}-s${WHITE} : Enter full location(with name) of syncing script file
+        ${PURPLE}*${WHITE} This will be created, you don't need to create
+        ${PURPLE}*${WHITE} ${CYAN}~/Desktop/myFolder/anotherFolder/<name_of_sync_script>${WHITE}
+    ${RED}-a${WHITE} : Enter name for the alias to be used to edit the config file
+        ${PURPLE}*${WHITE} ${CYAN}my_alias${WHITE}
+    ${RED}-g${WHITE} : Enter full location(with name) of directory to be used as main for syncing
+        ${PURPLE}*${WHITE} Folder can be already present, tool will check for .git folder and will do the job accordingly
+        ${PURPLE}*${WHITE} ${CYAN}~/Desktop/myFolder/<name_of_git_main_folder>${WHITE}
+    ${RED}-c${WHITE} : Enter full location(with name) of configuration file
+        ${PURPLE}*${WHITE} If not already found, will show you a prompt to create it during the process of runninf of the tool
+        ${PURPLE}*${WHITE} ${CYAN}~/<name_of_configuration_file>${WHITE}
+    ${RED}-h${WHITE} : Show this help message "
 
 while getopts m:s:a:g:c:h input
 do
@@ -77,6 +86,26 @@ h) echo "${USAGE}" && exit 0 ;;
 	echo "Invalid option: -$input" && exit 0 ;;
 esac
 done
+
+BANNER="$(clear)
+              #############################################################################################
+              #                  ${YELLOW}dcSAGC${WHITE} - ${BLUE}delete/create {SYNC, ALIAS, GITHUB, CONFIG} files${WHITE}               #
+              #                                                                                           #
+              #    ${GREEN}Author${WHITE}: ${CYAN}Arpit Bhardwaj(proffapt)${WHITE}                                                       #
+              #    ${GREEN}Twitter${WHITE}: ${CYAN}@proffapt${WHITE}                                                                     #
+              #    ${GREEN}Github${WHITE}: ${CYAN}proffapt${WHITE}                                                                       #
+              #    ${GREEN}Gitlab${WHITE}: ${CYAN}proffapt${WHITE}                                                                       #
+              #    ${GREEN}Instagram${WHITE}: ${ORANGE}I Don't Use That Shit${WHITE}                                                       #
+              #    ${GREEN}Facebook${WHITE}: ${ORANGE}I Don't Want My Data To Be Available On DarkWeb lol${WHITE}                          #
+              #    ${GREEN}Email${WHITE}: ${CYAN}proffapt@protonmail.com${WHITE}                                                         #
+              #                                                                                           #
+              #           ${GREEN}License${WHITE}: ${CYAN}BSD License 2.0${WHITE}                                                        #
+              #           ${RED}Note:${WHITE} ${PURPLE}If You Find Any BUGS From dcSAGC, PLEASE REPORT IT TO ME!${WHITE}                 #
+              #           ${PURPLE}Also Email Me If You Have Any Comments / Criticisms Or Suggestions - Thanks${WHITE}     #
+              #                                                                                           #
+              ############################################################################################# 
+
+              ${YELLOW}Automate the unique process for syncing your configuration from your local machine to github.${WHITE}"
 
 ## Extracting names of files and folders from given location :
 
@@ -95,6 +124,9 @@ CURRENT_LOCATION=$(pwd)
 ## Creating the syncing files logic :
 
 if [[ $MODE == create ]]; then
+
+    echo "${BANNER}"
+    echo
 
     if [[ ! -f "$CONFIG_FILE_location" ]]; then
         echo -e "${GREEN}[+] ${BLUE}Creating configuration file${WHITE}"
@@ -305,6 +337,9 @@ echo -e '\e[0;94m------------------\e[0m' " > $SYNC_SCRIPT_location
 
 elif [[ $MODE == delete ]]; then
 
+    echo "${BANNER}"
+    echo
+
     ## Removing link 
     if [[ -f "$CONFIG_FILE_location" ]]; then
         if [[ -L "$CONFIG_FILE_location" ]]; then
@@ -407,6 +442,10 @@ elif [[ $MODE == delete ]]; then
     fi
 
 else 
+
+    echo "${BANNER}"
+    echo
+
     echo -e "${RED}ERROR${WHITE}: Invalid mode selected - '${ORANGE}$1${WHITE}'"
     echo -e "${RED}[!] ${WHITE}Exitting the tool..${WHITE}"
 
