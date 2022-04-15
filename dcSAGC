@@ -66,7 +66,7 @@ ${BLUE}where:${WHITE}
         ${PURPLE}*${WHITE} ${CYAN}my_alias${WHITE}
     ${RED}-g${WHITE} : Enter full location(with name) of directory to be used as main for syncing
         ${PURPLE}*${WHITE} Folder can be already present, tool will check for .git folder and will do the job accordingly
-        ${PURPLE}*${WHITE} ${CYAN}~/Desktop/myFolder/<name_of_git_main_folder>${WHITE}
+        ${PURPLE}*${WHITE} ${CYAN}~/Desktop/myFolder/<name_of_git_main_folder>/${WHITE}
     ${RED}-c${WHITE} : Enter full location(with name) of configuration file
         ${PURPLE}*${WHITE} If not already found, will show you a prompt to create it during the process of runninf of the tool
         ${PURPLE}*${WHITE} ${CYAN}~/<name_of_configuration_file>${WHITE}
