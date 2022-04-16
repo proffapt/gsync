@@ -140,38 +140,20 @@ _Now since we are done with the setting up of environment suitable for the proje
   ```sh
   dcSAGC -m create -s ~/sandbox/dcSAGC/sync_file/syncer -a test.e -g ~/sandbox/dcSAGC/git_folder/ -c ~/sandbox/dcSAGC/config_file/config.file
   ```
-  <div align="center">
-    <a href="https://github.com/proffapt/dcSAGC">
-      <img src=".images/create_1.png" alt="product screenshot">
-    </a>
-  </div>
-  <div align="center">
-    <a href="https://github.com/proffapt/dcSAGC">
-      <img src=".images/create_2.png" alt="product screenshot">
-    </a>
-  </div>
 
 * Delete mode
   ```sh
   dcSAGC -m delete -s ~/sandbox/dcSAGC/sync_file/syncer -a test.e -g ~/sandbox/dcSAGC/git_folder/ -c ~/sandbox/dcSAGC/config_file/config.file
   ```
-  <div align="center">
-    <a href="https://github.com/proffapt/dcSAGC">
-      <img src=".images/delete.png" alt="product screenshot">
-    </a>
-  </div>
+
 3. Source your configuration file!(if other than `bash`)
 4. Now if you used `create` mode, use the alias(`test.e` here) to edit your configuration file(`config.file` here), the sync script(`syncer` here)
 will do it's job and sync the configuration file to specified github repo.
   ```sh
   test.e
   ```
-  <div align="center">
-    <a href="https://github.com/proffapt/dcSAGC">
-      <img src=".images/usage.png" alt="product screenshot">
-    </a>
-  </div>
   
+#### * See `create_1.png`, `create_2.png`, `delete.png` and `usage.png` in ```.images``` folder, for outputs and usages of above commands.
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
