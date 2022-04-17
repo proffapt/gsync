@@ -31,61 +31,7 @@ BLACK=`tput setaf 8`
 ORANGE=`tput setaf 9`
 RESET=$(tput sgr0)
 
-## Usage, Banner and arguments :
-
-USAGE="$(clear)
-              #############################################################################################
-              #                  ${YELLOW}dcSAGC${WHITE} - ${BLUE}delete/create {SYNC, ALIAS, GITHUB, CONFIG} files${WHITE}               #
-              #                                                                                           #
-              #    ${GREEN}Author${WHITE}: ${CYAN}Arpit Bhardwaj(proffapt)${WHITE}                                                       #
-              #    ${GREEN}Twitter${WHITE}: ${CYAN}@proffapt${WHITE}                                                                     #
-              #    ${GREEN}Github${WHITE}: ${CYAN}proffapt${WHITE}                                                                       #
-              #    ${GREEN}Gitlab${WHITE}: ${CYAN}proffapt${WHITE}                                                                       #
-              #    ${GREEN}Instagram${WHITE}: ${ORANGE}I Don't Use That Shit${WHITE}                                                       #
-              #    ${GREEN}Facebook${WHITE}: ${ORANGE}I Don't Want My Data To Be Available On DarkWeb lol${WHITE}                          #
-              #    ${GREEN}Email${WHITE}: ${CYAN}proffapt@protonmail.com${WHITE}                                                         #
-              #                                                                                           #
-              #           ${GREEN}License${WHITE}: ${CYAN}BSD License 2.0${WHITE}                                                        #
-              #           ${RED}Note:${WHITE} ${PURPLE}If You Find Any BUGS From dcSAGC, PLEASE REPORT IT TO ME!${WHITE}                 #
-              #           ${PURPLE}Also Email Me If You Have Any Comments / Criticisms Or Suggestions - Thanks${WHITE}     #
-              #                                                                                           #
-              ############################################################################################# 
-
-              ${YELLOW}Automate the unique process for syncing your configuration from your local machine to github.${WHITE}
-
-${BLUE}USAGE:${WHITE} $(basename "$0") [${RED}-m${WHITE} ${CYAN}delete/create${WHITE}] [${RED}-s${WHITE} ${CYAN}<sync_script_location>${WHITE}] [${RED}-a${WHITE} ${CYAN}<name_of_alias>${WHITE}] [${RED}-g${WHITE} ${CYAN}<git_main_folder>${WHITE}] [${RED}-c${WHITE} ${CYAN}<config_file_location>${WHITE}]
-
-${BLUE}where:${WHITE}
-    ${RED}-m${WHITE} : Specify the mode.. of operation for the tool
-         ${CYAN}create${WHITE} : starts the process of creation
-         ${CYAN}delete${WHITE} : starts the process of deletion
-    ${RED}-s${WHITE} : Enter full location(with name) of syncing script file
-        ${PURPLE}*${WHITE} This will be created, you don't need to create
-        ${PURPLE}*${WHITE} ${CYAN}~/Desktop/myFolder/anotherFolder/<name_of_sync_script>${WHITE}
-    ${RED}-a${WHITE} : Enter name for the alias to be used to edit the config file
-        ${PURPLE}*${WHITE} ${CYAN}my_alias${WHITE}
-    ${RED}-g${WHITE} : Enter full location(with name) of directory to be used as main for syncing
-        ${PURPLE}*${WHITE} Folder can be already present, tool will check for .git folder and will do the job accordingly
-        ${PURPLE}*${WHITE} ${CYAN}~/Desktop/myFolder/<name_of_git_main_folder>/${WHITE}
-    ${RED}-c${WHITE} : Enter full location(with name) of configuration file
-        ${PURPLE}*${WHITE} If not already found, will show you a prompt to create it during the process of runninf of the tool
-        ${PURPLE}*${WHITE} ${CYAN}~/<name_of_configuration_file>${WHITE}
-    ${RED}-h${WHITE} : Show this help message "
-
-while getopts m:s:a:g:c:h input
-do
-case "${input}"
-in
-m) MODE=${OPTARG};;
-s) SYNC_SCRIPT_location=${OPTARG};;
-a) ALIAS=${OPTARG};;
-g) GIT_MAIN_FOLDER_location=${OPTARG};;
-c) CONFIG_FILE_location=${OPTARG};;
-h) echo "${USAGE}" && exit 0 ;;
-*)  echo
-	echo "Invalid option: -$input" && exit 0 ;;
-esac
-done
+## Banner, Usage and arguments :
 
 BANNER="$(clear)
               #############################################################################################
@@ -107,6 +53,48 @@ BANNER="$(clear)
 
               ${YELLOW}Automate the unique process for syncing your configuration from your local machine to github.${WHITE}"
 
+USAGE="$BANNER
+
+${BLUE}USAGE:${WHITE} $(basename "$0") [${RED}-m${WHITE} ${CYAN}delete/create${WHITE}] [${RED}-s${WHITE} ${CYAN}<sync_script_location>${WHITE}] [${RED}-a${WHITE} ${CYAN}<name_of_alias>${WHITE}] [${RED}-g${WHITE} ${CYAN}<git_main_folder>${WHITE}] [${RED}-c${WHITE} ${CYAN}<config_file_location>${WHITE}]
+
+${BLUE}where:${WHITE}
+    ${RED}-m${WHITE} : Specify the mode.. of operation for the tool
+         ${CYAN}create${WHITE} : starts the process of creation
+         ${CYAN}delete${WHITE} : starts the process of deletion
+    ${RED}-s${WHITE} : Enter full location(with name) of syncing script file
+        ${PURPLE}*${WHITE} This will be created, you don't need to create
+        ${PURPLE}*${WHITE} ${CYAN}~/Desktop/myFolder/anotherFolder/<name_of_sync_script>${WHITE}
+    ${RED}-a${WHITE} : Enter name for the alias to be used to edit the config file
+        ${PURPLE}*${WHITE} ${CYAN}my_alias${WHITE}
+    ${RED}-g${WHITE} : Enter full location(with name) of directory to be used as main for syncing
+        ${PURPLE}*${WHITE} Folder can be already present, tool will check for .git folder and will do the job accordingly
+        ${PURPLE}*${WHITE} ${CYAN}~/Desktop/myFolder/<name_of_git_main_folder>/${WHITE}
+    ${RED}-c${WHITE} : Enter full location(with name) of configuration file
+        ${PURPLE}*${WHITE} If not already found, will show you a prompt to create it during the process of runninf of the tool
+        ${PURPLE}*${WHITE} ${CYAN}~/<name_of_configuration_file>${WHITE}
+    ${RED}-h${WHITE} : Show this help message 
+    
+${BLUE}Example(s):${WHITE}
+    $(basename "$0") ${RED}-m${WHITE} ${CYAN}create${WHITE} ${RED}-s${WHITE} ${CYAN}~/Desktop/sync_scripts/bashrc_syncer${WHITE} ${RED}-a${WHITE} ${CYAN}bashrc.edit${WHITE} ${RED}-g${WHITE} ${CYAN}~/Desktop/configs/bashrc/${WHITE} ${RED}-c${WHITE} ${CYAN}~/.bashrc${WHITE}
+    $(basename "$0") ${RED}-m${WHITE} ${CYAN}delete${WHITE} ${RED}-s${WHITE} ${CYAN}~/Desktop/sync_scripts/bashrc_syncer${WHITE} ${RED}-a${WHITE} ${CYAN}bashrc.edit${WHITE} ${RED}-g${WHITE} ${CYAN}~/Desktop/configs/bashrc/${WHITE} ${RED}-c${WHITE} ${CYAN}~/.bashrc${WHITE}
+    "
+
+while getopts m:s:a:g:c:h input
+do
+case "${input}"
+in
+m) MODE=${OPTARG};;
+s) SYNC_SCRIPT_location=${OPTARG};;
+a) ALIAS=${OPTARG};;
+g) GIT_MAIN_FOLDER_location=${OPTARG};;
+c) CONFIG_FILE_location=${OPTARG};;
+h) echo "${USAGE}" && exit 0 ;;
+*)  echo
+	echo "Invalid option: -$input" && exit 0 ;;
+esac
+done
+
+
 ## Extracting names of files and folders from given location :
 
 SHELL_LOCATION=$(echo $SHELL)
@@ -114,15 +102,24 @@ SHELL_TYPE="${SHELL_LOCATION##*/}"
 SYNC_SCRIPT="${SYNC_SCRIPT_location##*/}"
 SYNC_SCRIPT_folder="${SYNC_SCRIPT_location%/*}"
 git_SYNC_SCRIPT_folder="$SYNC_SCRIPT_folder/.git" ## We got without a '/'
-IGIT_FOLDER="$GIT_MAIN_FOLDER_location.git" ## We got with a '/'
 CONFIG_FILE="${CONFIG_FILE_location##*/}"
+
+check_IGIT_FOLDER="${GIT_MAIN_FOLDER_location##*/}"
+if [[ $check_IGIT_FOLDER == "" ]]; then
+    ## We got with a '/'
+    IGIT_FOLDER="$GIT_MAIN_FOLDER_location.git" 
+    new_CONFIG_FILE_LOCATION="$GIT_MAIN_FOLDER_location$CONFIG_FILE"
+else
+    ## We got without '/'
+    IGIT_FOLDER="$GIT_MAIN_FOLDER_location/.git" 
+    new_CONFIG_FILE_LOCATION="$GIT_MAIN_FOLDER_location/$CONFIG_FILE"
+fi
 
 ## Script execution location :
 
 CURRENT_LOCATION=$(pwd)
 
 ## Creating the syncing files logic :
-
 if [[ $MODE == create ]]; then
 
     echo "${BANNER}"
@@ -144,19 +141,39 @@ if [[ $MODE == create ]]; then
         echo -e "${YELLOW}[-] ${BLUE}Local git folder already exists!${WHITE}"
     fi
 
-    ## Checking if git folder is git initialised.. if not initialising it and creating README.md file along with pushing all of the changes to github
+    ## Checking if git folder is git initialised.. if not.. initialising it and creating README.md file along with pushing all of the changes to github
     if [[ ! -d "$IGIT_FOLDER" ]]; then
         echo -e "${GREEN}[+] ${BLUE}Initialising git in the GIT folder${WHITE}"
 
         cd $GIT_MAIN_FOLDER_location
         git init
-        read -p "$(echo -e "${GREEN}[*] ${CYAN}Enter the git repository link to be used as origin: ${WHITE}")" ORIGIN
-        read -p "$(echo -e "${GREEN}[*] ${CYAN}Specify the visibility to set for repo [public/private]: ${WHITE}")" VISIBILITY
+        git branch -m main
 
-        echo -e "${GREEN}[+] ${BLUE}Creating repository on github..${WHITE}"
-        gh repo create $ORIGIN --$VISIBILITY --description "Git repo for syncing $CONFIG_FILE in real-time"
-        git remote add origin $ORIGIN
-        
+        ## Logic for github remote repo
+        read -p "$(echo -e "${GREEN}[*] ${CYAN}Do you want to create a new github repository or to use already existing one?[new/existing]: ${WHITE}")" ANSWER
+
+        if [[ $ANSWER == new ]]; then
+            echo -e "${GREEN}[+] ${BLUE}Creating repository on github..${WHITE}"
+
+            read -p "$(echo -e "${GREEN}[*] ${CYAN}Enter the github repository name to be created and used ['owner/repo_name']: ${WHITE}")" NEW_ORIGIN
+            read -p "$(echo -e "${GREEN}[*] ${CYAN}Specify the visibility to set for repo [public/private]: ${WHITE}")" VISIBILITY
+
+            gh repo create https://github.com/$NEW_ORIGIN --$VISIBILITY --description "Git repo for syncing $CONFIG_FILE in real-time"
+            git remote add origin https://github.com/$NEW_ORIGIN
+        elif [[ $ANSWER == existing ]]; then
+            echo -e "${YELLOW}[-] ${BLUE}Skipping creation of remote repository on github..${WHITE}"
+            echo -e "${GREEN}[+] ${BLUE}Using already existing github repository${WHITE}"
+
+            read -p "$(echo -e "${GREEN}[*] ${CYAN}Enter already existing github repository name to be used ['owner/repo_name']: ${WHITE}")" EXISTING_ORIGIN
+
+            git remote add origin https://github.com/$EXISTING_ORIGIN
+        else
+            echo -e "${RED}ERROR${WHITE}: Invalid choice selected - '${ORANGE}$ANSWER${WHITE}'"
+            echo -e "${RED}[!] ${WHITE}Exitting the tool..${WHITE}"
+
+            exit 0
+        fi
+
         ## Readme condition
         if [[ ! -f "README.md" ]]; then
             echo -e "${GREEN}[+] ${BLUE}Creating README.md file in the git folder${WHITE}"
@@ -172,7 +189,44 @@ if [[ $MODE == create ]]; then
     else
         echo -e "${YELLOW}[-] ${BLUE}Git is already initialised in the git folder!${WHITE}"
 
+        ## checking the existence of remote github repo in the .git folder
         cd $GIT_MAIN_FOLDER_location
+        git branch -m main
+
+        read -p "$(echo -e "${GREEN}[*] ${CYAN}Enter alias you 'used'/'want to use' for the github repository[ex: origin]: ${WHITE}")" REMOTE_REPO
+        REMOTE_TEST=$(git remote | grep $REMOTE_REPO > /dev/null && echo "69")
+
+        if [[ $REMOTE_TEST != 69 ]]; then
+            
+            ## Logic for github remote repo
+            echo -e "${CYAN}[~] ${BLUE}$REMOTE_REPO doesn't exist..${WHITE}"
+            read -p "$(echo -e "${GREEN}[*] ${CYAN}Do you want to create a new github repository or to use already existing one?[new/existing]: ${WHITE}")" ANSWER
+
+            if [[ $ANSWER == new ]]; then
+                echo -e "${GREEN}[+] ${BLUE}Creating repository on github..${WHITE}"
+
+                read -p "$(echo -e "${GREEN}[*] ${CYAN}Enter the github repository name to be created and used ['owner/repo_name']: ${WHITE}")" NEW_ORIGIN
+                read -p "$(echo -e "${GREEN}[*] ${CYAN}Specify the visibility to set for repo [public/private]: ${WHITE}")" VISIBILITY
+
+                gh repo create https://github.com/$NEW_ORIGIN --$VISIBILITY --description "Git repo for syncing $CONFIG_FILE in real-time"
+                git remote add $REMOTE_REPO https://github.com/$NEW_ORIGIN
+            elif [[ $ANSWER == existing ]]; then
+                echo -e "${GREEN}[-] ${BLUE}Skipping creation of remote repository on github..${WHITE}"
+                echo -e "${GREEN}[+] ${BLUE}Using already existing github repository${WHITE}"
+
+                read -p "$(echo -e "${GREEN}[*] ${CYAN}Enter already existing github repository name to be used ['owner/repo_name']: ${WHITE}")" EXISTING_ORIGIN
+
+                git remote add $REMOTE_REPO https://github.com/$EXISTING_ORIGIN
+            else
+                echo -e "${RED}ERROR${WHITE}: Invalid choice selected - '${ORANGE}$ANSWER${WHITE}'"
+                echo -e "${RED}[!] ${WHITE}Exitting the tool..${WHITE}"
+
+                exit 0
+            fi
+        elif [[ $REMOTE_TEST  == 69 ]]; then
+            echo -e "${YELLOW}[-] ${BLUE}$REMOTE_REPO exists..${WHITE}"
+        fi
+
         ## Readme condition
         if [[ ! -f "README.md" ]]; then
             echo -e "${GREEN}[+] ${BLUE}Creating README.md file in the git folder${WHITE}"
@@ -180,7 +234,7 @@ if [[ $MODE == create ]]; then
             nvim README.md
             git add .
             git commit -m "adding README.md file and config file"
-            git push origin main
+            git push $REMOTE_REPO main
             cd $CURRENT_LOCATION
         else
             echo -e "${YELLOW}[-] ${BLUE}README.md file already exists in the git folder!${WHITE}"
@@ -188,7 +242,7 @@ if [[ $MODE == create ]]; then
     fi
 
     ## Moving config file to git folder
-    if [[ ! -f "$GIT_MAIN_FOLDER_location$CONFIG_FILE" ]]; then
+    if [[ ! -f "$new_CONFIG_FILE_LOCATION" ]]; then
         echo -e "${GREEN}[+] ${BLUE}Moving the config file to git folder${WHITE}"
         mv $CONFIG_FILE_location $GIT_MAIN_FOLDER_location
     else
@@ -198,7 +252,7 @@ if [[ $MODE == create ]]; then
     ## Creating link to config file in original location
     if [[ ! -f "$CONFIG_FILE_location" ]]; then
         echo -e "${GREEN}[+] ${BLUE}Creating link at config location from config file in git folder${WHITE}"
-        ln -s $GIT_MAIN_FOLDER_location$CONFIG_FILE $CONFIG_FILE_location
+        ln -s $new_CONFIG_FILE_LOCATION $CONFIG_FILE_location
     else
         echo -e "${YELLOW}[-] ${BLUE}Link already exist in config location${WHITE}"
     fi
@@ -344,7 +398,6 @@ echo -e '\e[0;94m------------------\e[0m' " > $SYNC_SCRIPT_location
     fi
 
 ## Creating the logic for undoing the mess the script made with create mode:
-
 elif [[ $MODE == delete ]]; then
 
     echo "${BANNER}"
@@ -363,9 +416,9 @@ elif [[ $MODE == delete ]]; then
     fi
 
     ## Placing original configuration file to where it belongs
-    if [[ -f "$GIT_MAIN_FOLDER_location$CONFIG_FILE" ]]; then
+    if [[ -f "$new_CONFIG_FILE_LOCATION" ]]; then
         echo -e "${GREEN}[+] ${BLUE}Putting original file back to it's expected location..${WHITE}"
-        cp $GIT_MAIN_FOLDER_location$CONFIG_FILE $CONFIG_FILE_location
+        cp $new_CONFIG_FILE_LOCATION $CONFIG_FILE_location
     else
         echo -e "${YELLOW}[-] ${BLUE}Configuration file doesn't exist in the specified location${WHITE}"
     fi
@@ -391,7 +444,7 @@ elif [[ $MODE == delete ]]; then
     fi
 
     ## Handling the config file in git folder
-    if [[ -f "$GIT_MAIN_FOLDER_location$CONFIG_FILE" ]]; then
+    if [[ -f "$new_CONFIG_FILE_LOCATION" ]]; then
         echo -e "${GREEN}[+] ${BLUE}Deleting the github repository git folder containing config file${WHITE}"
         cd $GIT_MAIN_FOLDER_location
         gh repo delete --confirm

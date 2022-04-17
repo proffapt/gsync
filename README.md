@@ -32,6 +32,7 @@
       <a href="#about-the-project">About The Project</a>
       <ul>
         <li><a href="#why-linking-config-files-?">Why linking config files ?</a></li>
+        <li><a href="#supports">Supports</a></li>
         <li><a href="#built-with">Built With</a></li>
       </ul>
     </li>
@@ -65,11 +66,26 @@ dcSAGC is a very useful tool for those who like to sync their configuration file
 * `delete mode`:
 1. Reverses all the mess it made, putting back the config file where it was supposed to be, replacing the link, deleting the github folder.
 
+<p align="right">(<a href="#top">back to top</a>)</p>
+
 <div id="why-linking-config-files-?"></div>
 
 ### Why linking config files ?
 
 - Suppose you wanna sync your .bashrc in `~/`, you will have to `git init` your `~/` which will show everywhere `(main)` in your terminal and might clash with your sub directories which are some local git projects, so yeah just move it somewhere else.. link that to original location and sync the file now
+
+<p align="right">(<a href="#top">back to top</a>)</p>
+
+<div id="supports"></div>
+
+### Supports:
+1. Shells
+    * `bash`
+    * `fish`
+    * `zsh`
+2. OS(s)
+    * `MacOS`[`BSD` based]
+    * any `*nix`[`GNU+Linux` and `Unix`]
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -92,7 +108,6 @@ To get a local copy up and running follow these simple steps.
 You will need to install the following dependencies for the project to work.
 * `git`
   ```sh
-  git config --global init.defaultBranch main
   git config credential.helper store
   ```
 * `gh`
