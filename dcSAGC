@@ -31,7 +31,7 @@ BLACK=`tput setaf 8`
 ORANGE=`tput setaf 9`
 RESET=$(tput sgr0)
 
-## Usage and arguments :
+## Usage, Banner and arguments :
 
 USAGE="$(clear)
               #############################################################################################
@@ -128,6 +128,7 @@ if [[ $MODE == create ]]; then
     echo "${BANNER}"
     echo
 
+    ## Configuration file creation condition
     if [[ ! -f "$CONFIG_FILE_location" ]]; then
         echo -e "${GREEN}[+] ${BLUE}Creating configuration file${WHITE}"
         nvim $CONFIG_FILE_location
@@ -135,6 +136,7 @@ if [[ $MODE == create ]]; then
         echo -e "${YELLOW}[-] ${BLUE}Configuration file already exists!${WHITE}"
     fi
 
+    ## Git folder creation condition
     if [[ ! -d "$GIT_MAIN_FOLDER_location" ]]; then
         echo -e "${GREEN}[+] ${BLUE}Creating local git folder${WHITE}"
         mkdir $GIT_MAIN_FOLDER_location
@@ -142,9 +144,10 @@ if [[ $MODE == create ]]; then
         echo -e "${YELLOW}[-] ${BLUE}Local git folder already exists!${WHITE}"
     fi
 
+    ## Checking if git folder is git initialised.. if not initialising it and creating README.md file along with pushing all of the changes to github
     if [[ ! -d "$IGIT_FOLDER" ]]; then
-
         echo -e "${GREEN}[+] ${BLUE}Initialising git in the GIT folder${WHITE}"
+
         cd $GIT_MAIN_FOLDER_location
         git init
         read -p "$(echo -e "${GREEN}[*] ${CYAN}Enter the git repository link to be used as origin: ${WHITE}")" ORIGIN
@@ -153,7 +156,8 @@ if [[ $MODE == create ]]; then
         echo -e "${GREEN}[+] ${BLUE}Creating repository on github..${WHITE}"
         gh repo create $ORIGIN --$VISIBILITY --description "Git repo for syncing $CONFIG_FILE in real-time"
         git remote add origin $ORIGIN
-
+        
+        ## Readme condition
         if [[ ! -f "README.md" ]]; then
             echo -e "${GREEN}[+] ${BLUE}Creating README.md file in the git folder${WHITE}"
 
@@ -165,12 +169,11 @@ if [[ $MODE == create ]]; then
         else
             echo -e "${YELLOW}[-] ${BLUE}README.md file already exists in the git folder!${WHITE}"
         fi
-
-        echo -e "${GREEN}[+] ${BLUE}Git successfully initialised in the git folder${WHITE}"
     else
         echo -e "${YELLOW}[-] ${BLUE}Git is already initialised in the git folder!${WHITE}"
 
         cd $GIT_MAIN_FOLDER_location
+        ## Readme condition
         if [[ ! -f "README.md" ]]; then
             echo -e "${GREEN}[+] ${BLUE}Creating README.md file in the git folder${WHITE}"
             
@@ -182,9 +185,9 @@ if [[ $MODE == create ]]; then
         else
             echo -e "${YELLOW}[-] ${BLUE}README.md file already exists in the git folder!${WHITE}"
         fi
-
     fi
 
+    ## Moving config file to git folder
     if [[ ! -f "$GIT_MAIN_FOLDER_location$CONFIG_FILE" ]]; then
         echo -e "${GREEN}[+] ${BLUE}Moving the config file to git folder${WHITE}"
         mv $CONFIG_FILE_location $GIT_MAIN_FOLDER_location
@@ -192,6 +195,7 @@ if [[ $MODE == create ]]; then
         echo -e "${YELLOW}[-] ${BLUE}Config already exist in the git folder${WHITE}"
     fi
 
+    ## Creating link to config file in original location
     if [[ ! -f "$CONFIG_FILE_location" ]]; then
         echo -e "${GREEN}[+] ${BLUE}Creating link at config location from config file in git folder${WHITE}"
         ln -s $GIT_MAIN_FOLDER_location$CONFIG_FILE $CONFIG_FILE_location
@@ -200,9 +204,7 @@ if [[ $MODE == create ]]; then
     fi
 
     ## creating syncer script
-        
     if [[ $SHELL_TYPE == fish ]]; then
-
         if [[ ! -f "$SYNC_SCRIPT_location" ]]; then
 
             echo -e "${GREEN}[+] ${BLUE}Creating sync script${WHITE}"
@@ -267,7 +269,6 @@ echo (set_color blue) '------------------' (set_color normal)" > $SYNC_SCRIPT_lo
         fi
 
     elif [[ $SHELL_TYPE == bash ]] || [[ $SHELL_TYPE == zsh ]]; then
-
         if [[ ! -f "$SYNC_SCRIPT_location" ]]; then
 
             echo -e "${GREEN}[+] ${BLUE}Creating sync script${WHITE}"
@@ -310,16 +311,14 @@ echo -e '\e[0;94m------------------\e[0m' " > $SYNC_SCRIPT_location
                 echo -e "${YELLOW}[-] ${BLUE}The git folder for sync file isn't initialised${WHITE}"
             fi
 
+            ## Updating the shell config file for the alias to edit(and update simultaneously) this config file
             echo -e "${GREEN}[+] ${BLUE}Adding the alias to shell config file and sourcing it${WHITE}"
             
+            ## Shell specific configuration file
             if [[ $SHELL_TYPE == bash ]]; then
-
                 SHELL_file=~/.bashrc
-    
             elif [[ $SHELL_TYPE == zsh ]]; then
-
                 SHELL_file=~/.zshrc
-
             fi
 
             echo "alias $ALIAS='nvim $CONFIG_FILE_location && $SYNC_SCRIPT_location'" >> $SHELL_file
@@ -344,6 +343,8 @@ echo -e '\e[0;94m------------------\e[0m' " > $SYNC_SCRIPT_location
         echo -e "${RED}[!] ${WHITE}Exitting the tool.."
     fi
 
+## Creating the logic for undoing the mess the script made with create mode:
+
 elif [[ $MODE == delete ]]; then
 
     echo "${BANNER}"
@@ -361,7 +362,7 @@ elif [[ $MODE == delete ]]; then
         echo -e "${YELLOW}[-] ${BLUE}Configuration link file doesn't exist!${WHITE}"
     fi
 
-    ## Placing original configuration file
+    ## Placing original configuration file to where it belongs
     if [[ -f "$GIT_MAIN_FOLDER_location$CONFIG_FILE" ]]; then
         echo -e "${GREEN}[+] ${BLUE}Putting original file back to it's expected location..${WHITE}"
         cp $GIT_MAIN_FOLDER_location$CONFIG_FILE $CONFIG_FILE_location
@@ -385,7 +386,6 @@ elif [[ $MODE == delete ]]; then
         else
             echo -e "${YELLOW}[-] ${BLUE}Sync script is not being synced with any github repo${WHITE}"
         fi
-
     else
         echo -e "${YELLOW}[-] ${BLUE}Configuration syncer script doesn't exist!${WHITE}"
     fi
@@ -403,27 +403,20 @@ elif [[ $MODE == delete ]]; then
         echo -e "${YELLOW}[-] ${BLUE}Git folder containing configuration file doesn't exist!${WHITE}"
     fi
 
-    ## Handling alias added into the config file
-
+    ## Shell configuration file location in various cases.
     if [[ $SHELL_TYPE == fish ]]; then
-
         SHELL_file=~/.config/fish/config.fish
-
     elif [[ $SHELL_TYPE == bash ]]; then
-
         SHELL_file=~/.bashrc
-    
     elif [[ $SHELL_TYPE == zsh ]]; then
-
         SHELL_file=~/.zshrc
-
     else
         echo -e "${RED}ERROR${WHITE}: You are using unsupported shell type! - '${ORANGE}$SHELL_TYPE${WHITE}'"
         echo -e "${RED}[!] ${WHITE}Exitting the tool.."
-
         exit 0
     fi
 
+    ## Handling alias added into the config file
     ALIAS_TEST=$(cat $SHELL_file | grep -q $ALIAS= && echo 69)
 
     if [[ $ALIAS_TEST == 69 ]]; then
@@ -463,4 +456,5 @@ else
     echo -e "${RED}[!] ${WHITE}Exitting the tool..${WHITE}"
 
     exit 0
+
 fi
