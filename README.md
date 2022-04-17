@@ -75,6 +75,7 @@ dcSAGC is a very useful tool for those who like to sync their configuration file
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 <div id="supports"></div>
+
 ### Supports:
 1. Shells
     * `bash`
