@@ -122,7 +122,6 @@ CONFIG_FILE="${CONFIG_FILE_location##*/}"
 CURRENT_LOCATION=$(pwd)
 
 ## Creating the syncing files logic :
-
 if [[ $MODE == create ]]; then
 
     echo "${BANNER}"
@@ -144,19 +143,39 @@ if [[ $MODE == create ]]; then
         echo -e "${YELLOW}[-] ${BLUE}Local git folder already exists!${WHITE}"
     fi
 
-    ## Checking if git folder is git initialised.. if not initialising it and creating README.md file along with pushing all of the changes to github
+    ## Checking if git folder is git initialised.. if not.. initialising it and creating README.md file along with pushing all of the changes to github
     if [[ ! -d "$IGIT_FOLDER" ]]; then
         echo -e "${GREEN}[+] ${BLUE}Initialising git in the GIT folder${WHITE}"
 
         cd $GIT_MAIN_FOLDER_location
         git init
-        read -p "$(echo -e "${GREEN}[*] ${CYAN}Enter the git repository link to be used as origin: ${WHITE}")" ORIGIN
-        read -p "$(echo -e "${GREEN}[*] ${CYAN}Specify the visibility to set for repo [public/private]: ${WHITE}")" VISIBILITY
+        git branch -m main
 
-        echo -e "${GREEN}[+] ${BLUE}Creating repository on github..${WHITE}"
-        gh repo create $ORIGIN --$VISIBILITY --description "Git repo for syncing $CONFIG_FILE in real-time"
-        git remote add origin $ORIGIN
-        
+        ## Logic for github remote repo
+        read -p "$(echo -e "${GREEN}[*] ${CYAN}Do you want to create a new github repository or to use already existing one?[new/existing]: ${WHITE}")" ANSWER
+
+        if [[ $ANSWER == new ]]; then
+            echo -e "${GREEN}[+] ${BLUE}Creating repository on github..${WHITE}"
+
+            read -p "$(echo -e "${GREEN}[*] ${CYAN}Enter the git repository link to be created and used: ${WHITE}")" NEW_ORIGIN
+            read -p "$(echo -e "${GREEN}[*] ${CYAN}Specify the visibility to set for repo [public/private]: ${WHITE}")" VISIBILITY
+
+            gh repo create $NEW_ORIGIN --$VISIBILITY --description "Git repo for syncing $CONFIG_FILE in real-time"
+            git remote add origin $NEW_ORIGIN
+        elif [[ $ANSWER == existing ]]; then
+            echo -e "${YELLOW}[-] ${BLUE}Skipping creation of remote repository on github..${WHITE}"
+            echo -e "${GREEN}[+] ${BLUE}Using already existing github repository${WHITE}"
+
+            read -p "$(echo -e "${GREEN}[*] ${CYAN}Enter already existing git repository link to be used: ${WHITE}")" EXISTING_ORIGIN
+
+            git remote add origin $EXISTING_ORIGIN
+        else
+            echo -e "${RED}ERROR${WHITE}: Invalid choice selected - '${ORANGE}$ANSWER${WHITE}'"
+            echo -e "${RED}[!] ${WHITE}Exitting the tool..${WHITE}"
+
+            exit 0
+        fi
+
         ## Readme condition
         if [[ ! -f "README.md" ]]; then
             echo -e "${GREEN}[+] ${BLUE}Creating README.md file in the git folder${WHITE}"
@@ -172,7 +191,44 @@ if [[ $MODE == create ]]; then
     else
         echo -e "${YELLOW}[-] ${BLUE}Git is already initialised in the git folder!${WHITE}"
 
+        ## checking the existence of remote github repo in the .git folder
         cd $GIT_MAIN_FOLDER_location
+        git branch -m main
+
+        read -p "$(echo -e "${GREEN}[*] ${CYAN}Enter alias you 'used'/'want to use' for the github repository[ex: origin]: ${WHITE}")" REMOTE_REPO
+        REMOTE_TEST=$(git remote | grep $REMOTE_REPO > /dev/null && echo "69")
+
+        if [[ $REMOTE_TEST != 69 ]]; then
+            
+            ## Logic for github remote repo
+            echo -e "${CYAN}[~] ${BLUE}$REMOTE_REPO doesn't exist..${WHITE}"
+            read -p "$(echo -e "${GREEN}[*] ${CYAN}Do you want to create a new github repository or to use already existing one?[new/existing]: ${WHITE}")" ANSWER
+
+            if [[ $ANSWER == new ]]; then
+                echo -e "${GREEN}[+] ${BLUE}Creating repository on github..${WHITE}"
+
+                read -p "$(echo -e "${GREEN}[*] ${CYAN}Enter the git repository link to be created and used: ${WHITE}")" NEW_ORIGIN
+                read -p "$(echo -e "${GREEN}[*] ${CYAN}Specify the visibility to set for repo [public/private]: ${WHITE}")" VISIBILITY
+
+                gh repo create $NEW_ORIGIN --$VISIBILITY --description "Git repo for syncing $CONFIG_FILE in real-time"
+                git remote add $REMOTE_REPO $NEW_ORIGIN
+            elif [[ $ANSWER == existing ]]; then
+                echo -e "${GREEN}[-] ${BLUE}Skipping creation of remote repository on github..${WHITE}"
+                echo -e "${GREEN}[+] ${BLUE}Using already existing github repository${WHITE}"
+
+                read -p "$(echo -e "${GREEN}[*] ${CYAN}Enter already existing git repository link to be used: ${WHITE}")" EXISTING_ORIGIN
+
+                git remote add $REMOTE_REPO $EXISTING_ORIGIN
+            else
+                echo -e "${RED}ERROR${WHITE}: Invalid choice selected - '${ORANGE}$ANSWER${WHITE}'"
+                echo -e "${RED}[!] ${WHITE}Exitting the tool..${WHITE}"
+
+                exit 0
+            fi
+        elif [[ $REMOTE_TEST  == 69 ]]; then
+            echo -e "${YELLOW}[-] ${BLUE}$REMOTE_REPO exists..${WHITE}"
+        fi
+
         ## Readme condition
         if [[ ! -f "README.md" ]]; then
             echo -e "${GREEN}[+] ${BLUE}Creating README.md file in the git folder${WHITE}"
@@ -180,7 +236,7 @@ if [[ $MODE == create ]]; then
             nvim README.md
             git add .
             git commit -m "adding README.md file and config file"
-            git push origin main
+            git push $REMOTE_REPO main
             cd $CURRENT_LOCATION
         else
             echo -e "${YELLOW}[-] ${BLUE}README.md file already exists in the git folder!${WHITE}"
@@ -344,7 +400,6 @@ echo -e '\e[0;94m------------------\e[0m' " > $SYNC_SCRIPT_location
     fi
 
 ## Creating the logic for undoing the mess the script made with create mode:
-
 elif [[ $MODE == delete ]]; then
 
     echo "${BANNER}"
