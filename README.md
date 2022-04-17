@@ -131,8 +131,6 @@ _Now since we are done with the setting up of environment suitable for the proje
    cd ./dcSAGC
    chmod +x ./dcSAGC
    ```
-3. Open the script in your favourite editor and search for `n-fish-ctgs` keyword.
-  So basically this alias to my personal sync script for my fish shell config, you can either remove it, or add your own custom alias for the same in place of this.
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -207,18 +205,15 @@ Don't forget to give the project a star! Thanks again!
 <!-- Changelog -->
 # Changelog
 
-## v1.0.0
+## v1.0.7
 
 ### Added or Changed
-- Added the logic for create mode
-- Added the logic for delete mode
-- Beautified usage output
-- Added Banner
-- Adding final documentation
+- Added freedom to use or not use '/' after github folder name
+- More robust logic for github folder manipulation
 
 ### Removed
 
-- Dropped the idea for saving default values
+- Useless multiple occurences of code.. implementing DRY principle
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 

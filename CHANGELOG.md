@@ -1,14 +1,11 @@
 # Changelog
 
-## v1.0.0
+## v1.0.7
 
 ### Added or Changed
-- Added the logic for create mode
-- Added the logic for delete mode
-- Beautified usage output
-- Added Banner
-- Adding final documentation
+- Added freedom to use or not use '/' after github folder name
+- More robust logic for github folder manipulation
 
 ### Removed
 
-- Dropped the idea for saving default values
+- Useless multiple occurences of code.. implementing DRY principle
