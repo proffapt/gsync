@@ -66,6 +66,8 @@ dcSAGC is a very useful tool for those who like to sync their configuration file
 * `delete mode`:
 1. Reverses all the mess it made, putting back the config file where it was supposed to be, replacing the link, deleting the github folder.
 
+<p align="right">(<a href="#top">back to top</a>)</p>
+
 <div id="why-linking-config-files-?"></div>
 
 ### Why linking config files ?
