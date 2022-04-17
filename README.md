@@ -146,7 +146,7 @@ _Now since we are done with the setting up of environment suitable for the proje
    ```
 <div align="center">
   <a href="https://github.com/proffapt/dcSAGC">
-    <img src=".images/screenshot.png" alt="product screenshot">
+    <img src=".images/help.png" alt="product screenshot">
   </a>
 </div>
 

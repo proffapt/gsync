@@ -62,7 +62,7 @@ ${BLUE}where:${WHITE}
          ${CYAN}create${WHITE} : starts the process of creation
          ${CYAN}delete${WHITE} : starts the process of deletion
     ${RED}-s${WHITE} : Enter full location(with name) of syncing script file
-        ${PURPLE}*${WHITE} This will be created, you don't need to create
+        ${PURPLE}*${WHITE} If not present, will be created during the time of execution of script
         ${PURPLE}*${WHITE} ${CYAN}~/Desktop/myFolder/anotherFolder/<name_of_sync_script>${WHITE}
     ${RED}-a${WHITE} : Enter name for the alias to be used to edit the config file
         ${PURPLE}*${WHITE} ${CYAN}my_alias${WHITE}
@@ -70,7 +70,7 @@ ${BLUE}where:${WHITE}
         ${PURPLE}*${WHITE} Folder can be already present, tool will check for .git folder and will do the job accordingly
         ${PURPLE}*${WHITE} ${CYAN}~/Desktop/myFolder/<name_of_git_main_folder>/${WHITE}
     ${RED}-c${WHITE} : Enter full location(with name) of configuration file
-        ${PURPLE}*${WHITE} If not already found, will show you a prompt to create it during the process of runninf of the tool
+        ${PURPLE}*${WHITE} If not already found, will show you a prompt to create it during the execution of the tool
         ${PURPLE}*${WHITE} ${CYAN}~/<name_of_configuration_file>${WHITE}
     ${RED}-h${WHITE} : Show this help message 
     
