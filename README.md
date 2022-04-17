@@ -108,7 +108,6 @@ To get a local copy up and running follow these simple steps.
 You will need to install the following dependencies for the project to work.
 * `git`
   ```sh
-  git config --global init.defaultBranch main
   git config credential.helper store
   ```
 * `gh`
