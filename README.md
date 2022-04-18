@@ -65,6 +65,9 @@ dcSAGC is a very useful tool for those who like to sync their configuration file
 4. Now whenever you will use the specified alias, it will open `nvim`, and after you close it, the sync script will sync the config file to the github repo every time you edit it..
 * `delete mode`:
 1. Reverses all the mess it made, putting back the config file where it was supposed to be, replacing the link, deleting the github folder.
+* `default mode`:
+1. Stores only the value for `-g` arg
+2. Just stores the value in a file inside the script folder and then sources it, obviously with some not so simple if-else nested conditions for various cases.
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -84,8 +87,8 @@ dcSAGC is a very useful tool for those who like to sync their configuration file
     * `fish`
     * `zsh`
 2. OS(s)
-    * `MacOS`[`BSD` based]
-    * any `*nix`[`GNU+Linux` and `Unix`]
+    * MacOS[`BSD` based]
+    * any *nix[`GNU+Linux` and `Unix`]
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -107,9 +110,6 @@ To get a local copy up and running follow these simple steps.
 ### Prerequisites
 You will need to install the following dependencies for the project to work.
 * `git`
-  ```sh
-  git config credential.helper store
-  ```
 * `gh`
   ```sh
   gh auth login
@@ -143,29 +143,35 @@ _Now since we are done with the setting up of environment suitable for the proje
    ```
 <div align="center">
   <a href="https://github.com/proffapt/dcSAGC">
-    <img src=".images/help.png" alt="product screenshot">
+    <img src=".images/ss_help.png" alt="product screenshot">
   </a>
 </div>
 
 2. Use cases for the script are as follows:
 * Create mode
   ```sh
-  dcSAGC -m create -s ~/sandbox/dcSAGC/sync_file/syncer -a test.e -g ~/sandbox/dcSAGC/git_folder/ -c ~/sandbox/dcSAGC/config_file/config.file
+  dcSAGC create -s ~/sandbox/dcSAGC/sync_file/syncer -a test.e -g ~/sandbox/dcSAGC/git_folder/ -c ~/sandbox/dcSAGC/config_file/config.file
   ```
 
 * Delete mode
   ```sh
-  dcSAGC -m delete -s ~/sandbox/dcSAGC/sync_file/syncer -a test.e -g ~/sandbox/dcSAGC/git_folder/ -c ~/sandbox/dcSAGC/config_file/config.file
+  dcSAGC delete -s ~/sandbox/dcSAGC/sync_file/syncer -a test.e -g ~/sandbox/dcSAGC/git_folder/ -c ~/sandbox/dcSAGC/config_file/config.file
   ```
+* Default mode
+   ```sh
+   dcSAGC default -g ~/sandbox/dcSAGC/github_folder/
+   dcSAGC create -s ~/sandbox/dcSAGC/sync_file/syncer -a test.e -c ~/sandbox/dcSAGC/config_file/config.file
+   dcSAGC delete -s ~/sandbox/dcSAGC/sync_file/syncer -a test.e -c ~/sandbox/dcSAGC/config_file/config.file
+   ```
 
-3. Source your configuration file!(if other than `bash`)
+3. Source your configuration file!
 4. Now if you used `create` mode, use the alias(`test.e` here) to edit your configuration file(`config.file` here), the sync script(`syncer` here)
 will do it's job and sync the configuration file to specified github repo.
-  ```sh
-  test.e
-  ```
+    ```sh
+    test.e
+    ```
   
-#### * See `create_1.png`, `create_2.png`, `delete.png` and `usage.png` in ```.images``` folder, for outputs and usages of above commands.
+#### * See output screenshots of various cases in [.images](https://github.com/proffapt/dcSAGC/tree/main/.images) folder.
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -178,6 +184,12 @@ will do it's job and sync the configuration file to specified github repo.
 - [x] Beautify help menu
 - [x] Adding banner
 - [x] Completing the Documentation
+- [x] Add banner
+- [x] Implement in script git repo creation
+- [x] Creating more robust logic for git folder manipulation
+- [x] Making the codebase much more readable
+- [x] Add the logic for default mode
+- [ ] Cleaning code for the one last time
 
 See the [open issues](https://github.com/proffapt/dcSAGC/issues) for a full list of proposed features (and known issues).
 
@@ -204,17 +216,24 @@ Don't forget to give the project a star! Thanks again!
 <!-- Changelog -->
 # Changelog
 
-## v1.0.8
+## v1.1.3
 
 ### Added or Changed
 - Added freedom to use or not use '/' after github folder name
 - More robust logic for github folder manipulation
+- More robust logic for alias management
 - Much more organised and efficient code base
+- Added default mode to save some default input args
+- Added banner
+- Added in script git repo creation
 
 ### Removed
 
 - Useless multiple occurences of code.. implementing DRY principle
 - `nvim` as dependency, now use your fav text editor
+- Removing git storage command from prerequisites
+- Many typos in the output of script
+- `-m` argument, use the mode name directly
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -244,6 +263,8 @@ Project Link: [https://github.com/proffapt/dcSAGC](https://github.com/proffapt/d
 * [Choose an Open Source License](https://choosealicense.com)
 * [Img Shields](https://shields.io)
 * [GH manual](https://cli.github.com/manual/gh_repo_create)
+* [sed - BSD v/s GNU/Linux](https://unix.stackexchange.com/questions/401905/bsd-sed-vs-gnu-sed-and-i)
+* [Detect changes in git folder](https://stackoverflow.com/questions/13715544/shell-script-to-check-git-for-changes-and-then-loop-through-changed-files)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
