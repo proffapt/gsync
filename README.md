@@ -115,7 +115,6 @@ You will need to install the following dependencies for the project to work.
   gh auth login
   gh auth refresh -h github.com -s delete_repo
   ```
-* `nvim`
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -205,15 +204,17 @@ Don't forget to give the project a star! Thanks again!
 <!-- Changelog -->
 # Changelog
 
-## v1.0.7
+## v1.0.8
 
 ### Added or Changed
 - Added freedom to use or not use '/' after github folder name
 - More robust logic for github folder manipulation
+- Much more organised and efficient code base
 
 ### Removed
 
 - Useless multiple occurences of code.. implementing DRY principle
+- `nvim` as dependency, now use your fav text editor
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
