@@ -4,12 +4,13 @@
 
 ### Added or Changed
 - Added freedom to use or not use '/' after github folder name
+- Added in script git repo creation
 - More robust logic for github folder manipulation
 - More robust logic for alias management
+- Added banner
 - Much more organised and efficient code base
 - Added default mode to save some default input args
-- Added banner
-- Added in script git repo creation
+- Adding support for more shells: `sh`, `csh`, `ksh` and `tcsh`
 
 ### Removed
 
