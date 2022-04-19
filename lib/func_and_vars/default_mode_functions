@@ -1,0 +1,17 @@
+#!/bin/bash
+
+# Functions for default mode
+# <start>
+ignore_args_other_than_g(){
+	if [[ "$ALIAS" != "" ]] || [[ "$CONFIG_FILE_location" != "" ]] ; then
+		echo -e "${RED}ERROR${WHITE}: Using unsupported arg(s), ${CYAN}default${WHITE} mode supports only the usage of ${GREEN}-g${WHITE} arg"
+    	echo -e "${RED}[!] ${WHITE}Ignoring arg(s) other than ${GREEN}-g${WHITE}"
+        echo
+    fi
+}
+
+write_defaults(){
+    echo GIT_MAIN_FOLDER_location="$GIT_MAIN_FOLDER_location" > "$defaults_LOCATION"
+    echo
+}
+# </start>

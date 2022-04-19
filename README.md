@@ -9,17 +9,17 @@
 [![MIT License][license-shield]][license-url]
 [![LinkedIn][linkedin-shield]][linkedin-url]
   
-  <h3 align="center">dcSAGC</h3>
+  <h3 align="center">gsync</h3>
 
   <p align="center">
     <i>Automate the unique process(by proffapt) for syncing your configuration from your local machine to github.</i>
     <br />
-    <a href="https://github.com/proffapt/dcSAGC"><strong>Explore the docs »</strong></a>
+    <a href="https://github.com/proffapt/gsync"><strong>Explore the docs »</strong></a>
     <br />
     <br />
-    <a href="https://github.com/proffapt/dcSAGC/issues">Report Bug</a>
+    <a href="https://github.com/proffapt/gsync/issues">Report Bug</a>
     ·
-    <a href="https://github.com/proffapt/dcSAGC/issues">Request Feature</a>
+    <a href="https://github.com/proffapt/gsync/issues">Request Feature</a>
   </p>
 </div>
 
@@ -56,12 +56,11 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-dcSAGC is a tool for those who like to sync their configuration files in real-time to github, so how does it exactly do that? Read the code for detailed understanding.. but for an overview.. here's a short explaination:
+gsync is a tool for those who like to sync their configuration files in real-time to github, so how does it exactly do that? Read the code for detailed understanding.. but for an overview.. here's a short explaination:
 * `create mode`:
 1. It checks for config file you specified, if it doesn't exist it will create it.
 2. Then it sets up the git folder locally and on github used to sync the config file, copies the earlier config file in here and creates a link to this config file in the original location, along with creating README.md file if it doesn't exist already.
-3. Then creates a sync file in specified location, if that location is linked with some remote github repo it will sync it there too else will move ahead.
-4. Now whenever you will use the specified alias, it will open your fav text editor, and after you finish editing, the sync script will sync the config file to the github repo every time you edit it..
+3. Now whenever you will use the specified alias, it will open your fav text editor, and after you finish editing, the sync script will sync the config file to the github repo every time you edit it..
 * `delete mode`:
 1. Reverses all the mess it made, putting back the config file where it was supposed to be, replacing the link, deleting the github folder.
 * `default mode`:
@@ -127,12 +126,12 @@ You will need to install the following dependencies for the project to work.
 _Now since we are done with the setting up of environment suitable for the project to compile/run, let's install and configure the project on your system locally now._
 1. Clone the repo
    ```sh
-   git clone https://github.com/proffapt/dcSAGC.git
+   git clone https://github.com/proffapt/gsync.git
    ```
 2. Make the script executable
    ```sh
-   cd ./dcSAGC
-   chmod +x ./dcSAGC
+   cd ./gsync
+   chmod +x ./gsync
    ```
 
 <p align="right">(<a href="#top">back to top</a>)</p>
@@ -143,29 +142,29 @@ _Now since we are done with the setting up of environment suitable for the proje
 
 1. Execute the help menu for script
    ```sh
-   ./dcSAGC -h
+   ./gsync -h
    ```
 <div align="center">
-  <a href="https://github.com/proffapt/dcSAGC">
-    <img src=".images/_ss_help.png" alt="product screenshot">
+  <a href="https://github.com/proffapt/gsync">
+    <img src="images/help_help.png" alt="product screenshot">
   </a>
 </div>
 
 2. Use cases for the script are as follows:
 * Create mode
   ```sh
-  dcSAGC create -s ~/sandbox/dcSAGC/sync_file/syncer -a test.e -g ~/sandbox/dcSAGC/git_folder/ -c ~/sandbox/dcSAGC/config_file/config.file
+  gsync create -c ~/sandbox/gsync/config_file/config.file  -g ~/sandbox/gsync/github_folder -a test.e
   ```
 
 * Delete mode
   ```sh
-  dcSAGC delete -s ~/sandbox/dcSAGC/sync_file/syncer -a test.e -g ~/sandbox/dcSAGC/git_folder/ -c ~/sandbox/dcSAGC/config_file/config.file
+  gsync delete -c ~/sandbox/gsync/config_file/config.file  -g ~/sandbox/gsync/github_folder -a test.e
   ```
 * Default mode
    ```sh
-   dcSAGC default -g ~/sandbox/dcSAGC/github_folder/
-   dcSAGC create -s ~/sandbox/dcSAGC/sync_file/syncer -a test.e -c ~/sandbox/dcSAGC/config_file/config.file
-   dcSAGC delete -s ~/sandbox/dcSAGC/sync_file/syncer -a test.e -c ~/sandbox/dcSAGC/config_file/config.file
+   gsync default -g ~/sandbox/gsync/github_folder/
+   gsync create -c ~/sandbox/gsync/config_file/config.file -a test.e
+   gsync delete -c ~/sandbox/gsync/config_file/config.file -a test.e
    ```
 
 3. Source your configuration file!
@@ -175,7 +174,7 @@ will do it's job and sync the configuration file to specified github repo.
     test.e
     ```
   
-#### * See output screenshots of various cases in [.images](https://github.com/proffapt/dcSAGC/tree/main/.images) folder.
+#### * See output screenshots of various cases in [images](https://github.com/proffapt/gsync/tree/main/images) folder.
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -198,7 +197,7 @@ Don't forget to give the project a star! Thanks again!
 <!-- Changelog -->
 # Changelog
 
-## v1.1.3
+## v1.1.4
 
 ### Added or Changed
 - Added freedom to use or not use '/' after github folder name
@@ -208,6 +207,7 @@ Don't forget to give the project a star! Thanks again!
 - Added banner
 - Added default mode to save some default input args
 - Adding support for more shells: `sh`, `csh`, `ksh` and `tcsh`
+- Implementing Universal syncscript for all configuration file
 
 ### Removed
 
@@ -215,6 +215,7 @@ Don't forget to give the project a star! Thanks again!
 - `nvim` as dependency, now use your fav text editor
 - Removing git storage command from prerequisites
 - `-m` argument, use the mode name directly
+- logic for individual syncscript for every config file, `-s` arg discontinued
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -233,7 +234,7 @@ Arpit Bhardwaj - [Twitter](https://twitter.com/proffapt) - [Telegram](https://t.
 
 Company website: [Cybernity](https://cybernity.org) - [CybernityForum](https://cybernity.group)
 
-Project Link: [https://github.com/proffapt/dcSAGC](https://github.com/proffapt/dcSAGC)
+Project Link: [https://github.com/proffapt/gsync](https://github.com/proffapt/gsync)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -252,16 +253,16 @@ Project Link: [https://github.com/proffapt/dcSAGC](https://github.com/proffapt/d
 
 <!-- MARKDOWN LINKS & IMAGES -->
 
-[contributors-shield]: https://img.shields.io/github/contributors/proffapt/dcSAGC.svg?style=for-the-badge
-[contributors-url]: https://github.com/proffapt/dcSAGC/graphs/contributors
-[forks-shield]: https://img.shields.io/github/forks/proffapt/dcSAGC.svg?style=for-the-badge
-[forks-url]: https://github.com/proffapt/dcSAGC/network/members
-[stars-shield]: https://img.shields.io/github/stars/proffapt/dcSAGC.svg?style=for-the-badge
-[stars-url]: https://github.com/proffapt/dcSAGC/stargazers
-[issues-shield]: https://img.shields.io/github/issues/proffapt/dcSAGC.svg?style=for-the-badge
-[issues-url]: https://github.com/proffapt/dcSAGC/issues
-[license-shield]: https://img.shields.io/github/license/proffapt/dcSAGC.svg?style=for-the-badge
-[license-url]: https://github.com/proffapt/dcSAGC/blob/master/LICENSE.txt
+[contributors-shield]: https://img.shields.io/github/contributors/proffapt/gsync.svg?style=for-the-badge
+[contributors-url]: https://github.com/proffapt/gsync/graphs/contributors
+[forks-shield]: https://img.shields.io/github/forks/proffapt/gsync.svg?style=for-the-badge
+[forks-url]: https://github.com/proffapt/gsync/network/members
+[stars-shield]: https://img.shields.io/github/stars/proffapt/gsync.svg?style=for-the-badge
+[stars-url]: https://github.com/proffapt/gsync/stargazers
+[issues-shield]: https://img.shields.io/github/issues/proffapt/gsync.svg?style=for-the-badge
+[issues-url]: https://github.com/proffapt/gsync/issues
+[license-shield]: https://img.shields.io/github/license/proffapt/gsync.svg?style=for-the-badge
+[license-url]: https://github.com/proffapt/gsync/blob/master/LICENSE.txt
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
 [linkedin-url]: https://linkedin.com/in/proffapt
 [product-screenshot]: .images/screenshot.png

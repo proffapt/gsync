@@ -1,6 +1,6 @@
 # Changelog
 
-## v1.1.3
+## v1.1.4
 
 ### Added or Changed
 - Added freedom to use or not use '/' after github folder name
@@ -10,6 +10,7 @@
 - Added banner
 - Added default mode to save some default input args
 - Adding support for more shells: `sh`, `csh`, `ksh` and `tcsh`
+- Implementing Universal syncscript for all configuration file
 
 ### Removed
 
@@ -17,3 +18,4 @@
 - `nvim` as dependency, now use your fav text editor
 - Removing git storage command from prerequisites
 - `-m` argument, use the mode name directly
+- logic for individual syncscript for every config file, `-s` arg discontinued

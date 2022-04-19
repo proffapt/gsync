@@ -1,0 +1,59 @@
+#!/bin/bash
+
+## Colors
+
+RED=$(tput setaf 1)
+GREEN=$(tput setaf 2)
+YELLOW=$(tput setaf 3)
+BLUE=$(tput setaf 4)
+PURPLE=$(tput setaf 5)
+CYAN=$(tput setaf 6)
+WHITE=$(tput setaf 7)
+ORANGE=$(tput setaf 9)
+
+## BANNER 
+
+BANNER="$(clear)
+              #############################################################################################
+              #                            ${YELLOW}gsync${WHITE} - ${BLUE}(Github sync configurer)${WHITE}                               #
+              #                                                                                           #
+              #    ${GREEN}Author${WHITE}: ${CYAN}Arpit Bhardwaj(proffapt)${WHITE}                                                       #
+              #    ${GREEN}Git(hub/lab)${WHITE}: ${CYAN}proffapt${WHITE}                                                                 #
+              #    ${GREEN}Twitter & Telegram${WHITE}: ${CYAN}@proffapt${WHITE}                                                          #
+              #    ${GREEN}Email${WHITE}: ${CYAN}proffapt@pm.me${WHITE}                                                                  #
+              #                                                                                           #
+              #           ${GREEN}License${WHITE}: ${CYAN}BSD License 2.0${WHITE}                                                        #
+              #                                                                                           #
+              #############################################################################################
+
+              ${YELLOW}Automate the unique process for syncing your config files from your local machine to github.${WHITE}"
+
+## USAGE
+
+USAGE="$BANNER
+
+${BLUE}USAGE:${WHITE} $(basename "$0") [${ORANGE}delete/create/default${WHITE}] [${RED}-s${WHITE} ${CYAN}<path_to_syncscript>${WHITE}] [${RED}-a${WHITE} ${CYAN}<name_of_alias>${WHITE}] [${RED}-g${WHITE} ${CYAN}<path_to_github_folder>${WHITE}] [${RED}-c${WHITE} ${CYAN}<path_to_config_file>${WHITE}]
+
+${BLUE}where:${WHITE}
+    ${RED}create${WHITE}  : Mode to setup auto-syncing
+    ${RED}delete${WHITE}  : Mode to revert everything back to original state
+    ${RED}default${WHITE} : Mode to store default value(s) for ${ORANGE}-g${WHITE} arg(s)
+
+    ${RED}-c${WHITE} : Specify path of configuration file
+    ${RED}-g${WHITE} : Specify path of dir which will be used as github's main dir for syncing
+    ${RED}-a${WHITE} : Specify alias to be used to edit the config file
+    ${RED}-h${WHITE} : Show this help message
+${RED}>>>> ${YELLOW}If something doesn't exist this tool will create that for you, if it already exists this tool will use that${WHITE}
+
+${BLUE}Example(s):${WHITE}
+    $(basename "$0") ${ORANGE}create${WHITE} ${RED}-c${WHITE} ${CYAN}~/.bashrc${WHITE} ${RED}-g${WHITE} ${CYAN}~/Desktop/configs/bashrc/${WHITE} ${RED}-a${WHITE} ${CYAN}basrc.edit${WHITE}
+${ORANGE}>>>> ${YELLOW}Use ${GREEN}bashrc.edit ${YELLOW}to edit this config file in future; as you end editing, changes will be synced to your github repo${WHITE}
+    $(basename "$0") ${ORANGE}delete${WHITE} ${RED}-c${WHITE} ${CYAN}~/.bashrc${WHITE} ${RED}-g${WHITE} ${CYAN}~/Desktop/configs/bashrc/${WHITE} ${RED}-a${WHITE} ${CYAN}basrc.edit${WHITE} 
+    $(basename "$0") ${ORANGE}default${WHITE} ${RED}-g${WHITE} ${CYAN}~/Desktop/configs/${WHITE}
+    "
+
+## Function calling Banner
+banner() {
+	echo "${BANNER}"
+	echo
+}

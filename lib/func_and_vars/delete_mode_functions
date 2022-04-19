@@ -1,0 +1,75 @@
+#!/bin/bash
+
+# Functions for delete mode
+# <start>
+delete_link() {
+	if [[ -f "$CONFIG_FILE_location" ]]; then
+		if [[ -L "$CONFIG_FILE_location" ]]; then
+			echo -e "${GREEN}[+] ${BLUE}Removing configuration 'link file'${WHITE}"
+
+			rm "$CONFIG_FILE_location"
+		else
+			echo -e "${YELLOW}[-] ${BLUE}This file at configuration location is not a link!${WHITE}"
+		fi
+	else
+		echo -e "${YELLOW}[-] ${BLUE}Configuration 'link file' doesn't exist!${WHITE}"
+	fi
+}
+
+put_back_config_file() {
+	if [[ -f "$new_CONFIG_FILE_LOCATION" ]]; then
+		echo -e "${GREEN}[+] ${BLUE}Putting configuration file back to it's original location from github folder${WHITE}"
+
+		cp "$new_CONFIG_FILE_LOCATION" "$CONFIG_FILE_location"
+	else
+		echo -e "${YELLOW}[-] ${BLUE}Configuration file doesn't exist in the github folder!${WHITE}"
+	fi
+}
+
+delete_git_folder_and_repo() {
+	if [[ -d "$GIT_MAIN_FOLDER_location" ]]; then
+		echo -e "${GREEN}[+] ${BLUE}Deleting the github repository containing configuration file${WHITE}"
+
+		cd "$GIT_MAIN_FOLDER_location" || exit
+		gh repo delete --confirm
+		cd "$CURRENT_LOCATION" || exit
+
+		echo -e "${GREEN}[+] ${BLUE}Deleting the github folder containing configuration file from your local machine${WHITE}"
+
+		rm -rf "$GIT_MAIN_FOLDER_location"
+	else
+		echo -e "${YELLOW}[-] ${BLUE}Github folder supposed to be containing configuration file doesn't exist!${WHITE}"
+	fi
+}
+
+delete_alias() {
+    ## Checking whether the specified remote repo alias exists or not
+	ALIAS_TEST=$(cat "$SHELL_file" | grep -q "$ALIAS"= && echo 69)
+
+	if [[ $ALIAS_TEST == 69 ]]; then
+		echo -e "${GREEN}[+] ${BLUE}Removing the alias: $ALIAS from SHELL config file${WHITE}"
+
+		## Adding support for macOS and other linux distros.. since sed is a bit diff on BSD based distros.
+		KERNEL=$(uname -s)
+		if [[ $KERNEL == Darwin ]]; then
+			## Using this method to edit links also.. incase your configuration file is a link itself!
+			if [[ -L "$SHELL_file" ]]; then
+				SHELL_CONFIG=$(readlink "$SHELL_file")
+				sed -i '' "/alias $ALIAS/d" "$SHELL_CONFIG"
+			else
+				sed -i '' "/alias $ALIAS/d" "$SHELL_file"
+			fi
+		else
+			## Using this method to edit links also.. incase your configuration file is a link itself!
+			if [[ -L "$SHELL_file" ]]; then
+				SHELL_CONFIG=$(readlink "$SHELL_file")
+				sed -i "/alias $ALIAS/d" "$SHELL_CONFIG"
+			else
+				sed -i "/alias $ALIAS/d" "$SHELL_file"
+			fi
+		fi
+	else
+		echo -e "${YELLOW}[-] ${BLUE}Alias: $ALIAS doesn't exist in SHELL config file!${WHITE}"
+	fi
+}
+# </start>
