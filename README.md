@@ -86,6 +86,10 @@ dcSAGC is a very useful tool for those who like to sync their configuration file
     * `bash`
     * `fish`
     * `zsh`
+    * `sh`
+    * `csh`
+    * `ksh`
+    * `tcsh`
 2. OS(s)
     * MacOS[`BSD` based]
     * any *nix[`GNU+Linux` and `Unix`]
