@@ -62,7 +62,7 @@ dcSAGC is a very useful tool for those who like to sync their configuration file
 1. It checks for config file you specified, if it doesn't exist it will create it.
 2. Then it sets up the git folder locally and on github used to sync the config file, copies the earlier config file in here and creates a link to this config file in the original location, along with creating README.md file if it doesn't exist and syncs this folder to your remote repo you entered during the process. --> Configuration synced for first time.
 3. Then creates a sync file in specified location, if that location is linked with some remote github repo it will sync it there too else will move ahead.
-4. Now whenever you will use the specified alias, it will open `nvim`, and after you close it, the sync script will sync the config file to the github repo every time you edit it..
+4. Now whenever you will use the specified alias, it will open your fav text editor, and after you finish editing, the sync script will sync the config file to the github repo every time you edit it..
 * `delete mode`:
 1. Reverses all the mess it made, putting back the config file where it was supposed to be, replacing the link, deleting the github folder.
 * `default mode`:
