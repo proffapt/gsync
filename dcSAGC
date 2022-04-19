@@ -87,7 +87,7 @@ fav_text_editor(){
         source "$TEXT_EDITOR_FILE"
     else
         source "$TEXT_EDITOR_FILE"
-		echo -e "${GREEN}[+] ${BLUE}Using $TEXT_EDITOR as editor ${CYAN}[change in $SCRIPT_LOCATION/.fav_editor]${WHITE}"
+		echo -e "${GREEN}[+] ${BLUE}Using ${GREEN}$TEXT_EDITOR${BLUE} as editor ${CYAN}[change in $SCRIPT_LOCATION/.fav_editor]${WHITE}"
     fi
 }
 
@@ -152,15 +152,16 @@ initialise_git(){
 		git branch -m main
 
 		## checking the existence of remote github repo in the .git folder
+		echo -e "${GREEN}[+] ${BLUE}Checking for the existense of remote repo os 'origin'${WHITE}"
 		REMOTE_TEST=$(git remote | grep origin >/dev/null && echo "69")
 
 		if [[ $REMOTE_TEST != 69 ]]; then
-			echo -e "${CYAN}[~] ${BLUE}Remote repo as origin doesn't exist!${WHITE}"
+			echo -e "${CYAN}[~] ${BLUE}Remote repo as 'origin' doesn't exist!${WHITE}"
 
 			## Logic for github remote repo
 			create_remote_github_repo
 		elif [[ $REMOTE_TEST == 69 ]]; then
-			echo -e "${YELLOW}[-] ${BLUE}Remote repo as origin exists!${WHITE}"
+			echo -e "${CYAN}[~] ${BLUE}Remote repo as 'origin' exists!${WHITE}"
 		fi
 	fi
 
@@ -190,23 +191,23 @@ move_config_to_git_folder() {
 
 		mv "$CONFIG_FILE_location" "$GIT_MAIN_FOLDER_location"
 	else
-		echo -e "${YELLOW}[-] ${BLUE}Configuration file already exist in the github folder${WHITE}"
+		echo -e "${YELLOW}[-] ${BLUE}Configuration file already exist in the github folder!${WHITE}"
 	fi
 }
 
 create_link_to_config() {
 	if [[ ! -f "$CONFIG_FILE_location" ]]; then
-		echo -e "${GREEN}[+] ${BLUE}Creating Configuration link file from configuration file in github folder${WHITE}"
+		echo -e "${GREEN}[+] ${BLUE}Creating Configuration 'link file' from configuration file in github folder${WHITE}"
 
 		ln -s "$new_CONFIG_FILE_LOCATION" "$CONFIG_FILE_location"
 	else
-		echo -e "${YELLOW}[-] ${BLUE}Configuration link file already exists!${WHITE}"
+		echo -e "${YELLOW}[-] ${BLUE}Configuration 'link file' already exists!${WHITE}"
 	fi
 }
 
 create_syncscript() {
     if [[ ! -f "$SYNC_SCRIPT_location" ]]; then
-        echo -e "${GREEN}[+] ${BLUE}Creating configuration syncscript${WHITE}"
+        echo -e "${GREEN}[+] ${BLUE}Creating 'configuration syncscript'${WHITE}"
 
         echo "#!/bin/bash" > "$SYNC_SCRIPT_location"
         echo "" >> "$SYNC_SCRIPT_location"
@@ -244,13 +245,13 @@ create_syncscript() {
         echo -e "${GREEN}[+] ${BLUE}Making it executable${WHITE}"
         chmod +x "$SYNC_SCRIPT_location"
     else
-		echo -e "${YELLOW}[-] ${BLUE}Configuration syncscript already exists!${WHITE}"
+		echo -e "${YELLOW}[-] ${BLUE}'Configuration syncscript' already exists!${WHITE}"
 	fi
 }
 
 push_syncscript() {
 	if [[ -d "$git_SYNC_SCRIPT_folder" ]]; then
-		echo -e "${GREEN}[+] ${BLUE}Syncing configuration syncscript to it's github repo${WHITE}"
+		echo -e "${GREEN}[+] ${BLUE}Syncing 'configuration syncscript' to it's github repo${WHITE}"
 
 		cd "$SYNC_SCRIPT_folder" || exit
 		git add "$SYNC_SCRIPT"
@@ -258,7 +259,7 @@ push_syncscript() {
 		git push -u origin main
 		cd "$CURRENT_LOCATION" || exit
 	else
-		echo -e "${YELLOW}[-] ${BLUE}The configuration syncscript containing folder isn't git initialised${WHITE}"
+		echo -e "${YELLOW}[-] ${BLUE}The 'configuration syncscript' containing folder isn't git initialised${WHITE}"
 	fi
 }
 
@@ -267,11 +268,11 @@ create_alias(){
 	ALIAS_TEST=$(cat "$SHELL_file" | grep -q "$ALIAS"= && echo 69)
 
     if [[ $ALIAS_TEST != 69 ]]; then
-        echo -e "${GREEN}[+] ${BLUE}Adding the alias to SHELL configuration file${WHITE}"
+        echo -e "${GREEN}[+] ${BLUE}Adding the alias to SHELL config file${WHITE}"
 
 	    echo "alias $ALIAS='$TEXT_EDITOR $CONFIG_FILE_location && $SYNC_SCRIPT_location'" >> "$SHELL_file"
     else
-        echo -e "${YELLOW}[-] ${BLUE}Alias already exists in SHELL configuration file${WHITE}"
+        echo -e "${YELLOW}[-] ${BLUE}Alias already exists in SHELL config file${WHITE}"
     fi
 }
 
@@ -280,7 +281,7 @@ sync_configuration_file(){
     check_CHANGES=$(git status --porcelain | grep -q "$CONFIG_FILE" && echo 69)
 
     if [[ "$check_CHANGES" != 69 ]]; then
-        echo -e "${YELLOW}[-] ${BLUE}There are no changes in configuration file, Skipping pushing to github${WHITE}"
+        echo -e "${YELLOW}[-] ${BLUE}There are no changes in configuration file, Skipping push to github${WHITE}"
         echo
     else
         echo -e "${GREEN}[+] ${BLUE}Syncing the configuration file to github${WHITE}"
@@ -297,14 +298,14 @@ sync_configuration_file(){
 delete_link() {
 	if [[ -f "$CONFIG_FILE_location" ]]; then
 		if [[ -L "$CONFIG_FILE_location" ]]; then
-			echo -e "${GREEN}[+] ${BLUE}Removing configuration link file${WHITE}"
+			echo -e "${GREEN}[+] ${BLUE}Removing configuration 'link file'${WHITE}"
 
 			rm "$CONFIG_FILE_location"
 		else
 			echo -e "${YELLOW}[-] ${BLUE}This file at configuration location is not a link!${WHITE}"
 		fi
 	else
-		echo -e "${YELLOW}[-] ${BLUE}Configuration link file doesn't exist!${WHITE}"
+		echo -e "${YELLOW}[-] ${BLUE}Configuration 'link file' doesn't exist!${WHITE}"
 	fi
 }
 
@@ -314,18 +315,18 @@ put_back_config_file() {
 
 		cp "$new_CONFIG_FILE_LOCATION" "$CONFIG_FILE_location"
 	else
-		echo -e "${YELLOW}[-] ${BLUE}Configuration file doesn't exist in the github folder${WHITE}"
+		echo -e "${YELLOW}[-] ${BLUE}Configuration file doesn't exist in the github folder!${WHITE}"
 	fi
 }
 
 delete_syncscript() {
 	if [[ -f "$SYNC_SCRIPT_location" ]]; then
-		echo -e "${GREEN}[+] ${BLUE}Removing configuration syncscript from your local machine${WHITE}"
+		echo -e "${GREEN}[+] ${BLUE}Removing 'configuration syncscript' from your local machine${WHITE}"
 
 		rm "$SYNC_SCRIPT_location"
 
 		if [[ -d "$git_SYNC_SCRIPT_folder" ]]; then
-			echo -e "${GREEN}[+] ${BLUE}Updating the github repo syncing the configuration syncscripts${WHITE}"
+			echo -e "${GREEN}[+] ${BLUE}Updating the github repo syncing the 'configuration syncscript'(s)${WHITE}"
 
 			cd "$SYNC_SCRIPT_folder" || exit
 			git add .
@@ -333,10 +334,10 @@ delete_syncscript() {
 			git push -u origin main
 			cd "$CURRENT_LOCATION" || exit
 		else
-			echo -e "${YELLOW}[-] ${BLUE}Configuration syncscript is not being synced with any github repo${WHITE}"
+			echo -e "${YELLOW}[-] ${BLUE}'Configuration syncscript' is not being synced with any github repo${WHITE}"
 		fi
 	else
-		echo -e "${YELLOW}[-] ${BLUE}Configuration syncscript doesn't exist!${WHITE}"
+		echo -e "${YELLOW}[-] ${BLUE}'Configuration syncscript' doesn't exist!${WHITE}"
 	fi
 }
 
@@ -352,7 +353,7 @@ delete_git_folder_and_repo() {
 
 		rm -rf "$GIT_MAIN_FOLDER_location"
 	else
-		echo -e "${YELLOW}[-] ${BLUE}Github folder containing configuration file doesn't exist!${WHITE}"
+		echo -e "${YELLOW}[-] ${BLUE}Github folder supposed to be containing configuration file doesn't exist!${WHITE}"
 	fi
 }
 
@@ -388,10 +389,26 @@ delete_alias() {
 }
 # </start>
 
+# Functions for default mode
+# <start>
+ignore_args_other_than_g(){
+	if [[ "$ALIAS" != "" ]] || [[ "$CONFIG_FILE_location" != "" ]] || [[ "$SYNC_SCRIPT_location" != "" ]] ; then
+		echo -e "${RED}ERROR${WHITE}: Using unsupported arg(s), ${CYAN}default${WHITE} mode supports only the usage of ${GREEN}-g${WHITE} arg"
+    	echo -e "${RED}[!] ${WHITE}Ignoring arg(s) other than ${GREEN}-g${WHITE}"
+        echo
+    fi
+}
+
+write_defaults(){
+    echo GIT_MAIN_FOLDER_location="$GIT_MAIN_FOLDER_location" > "$defaults_LOCATION"
+    echo
+}
+# </start>
+
 # Message and Error functions
 # <start>
 MSG_source_shell_config_file() {
-	echo -e "${CYAN}[^]${WHITE} ${YELLOW}Source your SHELL configuration file..${WHITE}"
+	echo -e "${CYAN}[^]${WHITE} ${YELLOW}Source your SHELL config file..${WHITE}"
 }
 
 _EXIT_(){
@@ -405,7 +422,6 @@ ERROR_invalid_input(){
     echo -e "${RED}ERROR:${BLUE} Invalid choice selected${WHITE}"
     _EXIT_
 }
-
 # </start>
 
 # Utility functions
@@ -423,11 +439,17 @@ shellcheck() {
 		SHELL_file=~/.bashrc
 	elif [[ $SHELL_TYPE == zsh ]]; then
 		SHELL_file=~/.zshrc
+	elif [[ $SHELL_TYPE == tcsh ]]; then
+		SHELL_file=~/.tcshrc
+	elif [[ $SHELL_TYPE == sh ]]; then
+		SHELL_file=~/.profile
+	elif [[ $SHELL_TYPE == csh ]]; then
+		SHELL_file=~/.cshrc
+	elif [[ $SHELL_TYPE == ksh ]]; then
+		SHELL_file=~/.kshrc
 	else
 		echo -e "${RED}ERROR${WHITE}: You are using unsupported shell type! - '${ORANGE}$SHELL_TYPE${WHITE}'"
-		echo -e "${RED}[!] ${WHITE}Exitting the tool.."
-
-		exit 0
+		_EXIT_
 	fi
 }
 
@@ -555,7 +577,7 @@ elif [[ "$MODE" == "delete" ]]; then
 	## Handling the config file in git folder and remote repo
 	delete_git_folder_and_repo
 
-	## Handling alias added into the SHELL configuration file
+	## Handling alias added into the SHELL config file
 	delete_alias
 
 	## Message to ask the user to source their configuration file
@@ -566,31 +588,26 @@ elif [[ "$MODE" == "delete" ]]; then
 elif [[ "$MODE" == "default" ]]; then
     banner
 
-    if [[ "$ALIAS" != "" ]] || [[ "$CONFIG_FILE_location" != "" ]] || [[ "$SYNC_SCRIPT_location" != "" ]] ; then
-		echo -e "${RED}ERROR${WHITE}: Using unsupported arg(s), ${CYAN}default${WHITE} mode supports only the usage of ${GREEN}-g${WHITE} arg"
-    	echo -e "${RED}[!] ${WHITE}Ignoring args other then ${GREEN}-g${WHITE}"
-        echo
-    fi
+	ignore_args_other_than_g
 
     defaults_LOCATION=$SCRIPT_LOCATION/.defaults
     if [[ "$GIT_MAIN_FOLDER_location" != "" ]]; then
-
         if [[ ! -f "$defaults_LOCATION" ]]; then
-    	    echo -e "${GREEN}[+] ${BLUE}Writing into .defaults file${WHITE}"
+    	    echo -e "${GREEN}[+] ${BLUE}Creating .defaults file and writing into .it for the first time${WHITE}"
 
-            echo GIT_MAIN_FOLDER_location="$GIT_MAIN_FOLDER_location" > "$defaults_LOCATION"
-            echo
+			write_defaults
         else
     	    echo -e "${CYAN}[~] ${BLUE}.defaults file already exists with following content${WHITE}"
+			echo 
             cat "$defaults_LOCATION"
+			echo
             
-            read -rp "$(echo -e "${GREEN}[*] ${CYAN}Do you want to over-write the contents of it? [y/n]: ${WHITE} ")" ICCHA
+            read -rp "$(echo -e "${GREEN}[*] ${CYAN}Do you want to over-write the contents of .defaults file? [y/n]: ${WHITE} ")" ICCHA
 
             if [[ "$ICCHA" == y ]]; then
-    	        echo -e "${GREEN}[+] ${BLUE}Over-writing into .defaults file${WHITE}"
+    	        echo -e "${GREEN}[+] ${BLUE}Over-writing .defaults file with new entry${WHITE}"
 
-                echo "GIT_MAIN_FOLDER_location=$GIT_MAIN_FOLDER_location" > "$defaults_LOCATION"
-                echo
+				write_defaults
             elif [[ "$ICCHA" == n ]]; then
     	        echo -e "${CYAN}[~] ${BLUE}Skipping over-writing of .defaults file${WHITE}"
                 echo
