@@ -143,13 +143,13 @@ initialise_git(){
 		echo -e "${GREEN}[+] ${BLUE}Initialising git in the github folder${WHITE}"
 
 		git init
-		git branch -m main
+		echo "ref: refs/heads/main" > ".git/HEAD"
 		## Logic for github remote repo
 		create_remote_github_repo
 	else
 		echo -e "${YELLOW}[-] ${BLUE}Git is already initialised in the github folder!${WHITE}"
 
-		git branch -m main
+		echo "ref: refs/heads/main" > ".git/HEAD"
 
 		## checking the existence of remote github repo in the .git folder
 		echo -e "${GREEN}[+] ${BLUE}Checking for the existense of remote repo os 'origin'${WHITE}"
