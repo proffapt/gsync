@@ -4,26 +4,24 @@
 RED=$(tput setaf 1)
 WHITE=$(tput setaf 7)
 
-while [ $OPTIND -le "$#" ]
-do
-    if getopts c:g: input
-    then
-        case "${input}" in
+while [ $OPTIND -le "$#" ]; do
+	if getopts c:g: input; then
+		case "${input}" in
 
 		c) _syncscript_CONFIG_FILE=${OPTARG} ;;
 		g) _syncscript_GIT_MAIN_FOLDER_location=${OPTARG} ;;
 		*)
 			echo -e "${RED}ERROR${WHITE}: Invalid option given to syncscript: -'${ORANGE}$input${WHITE}'"
-            echo -e "${RED}[!] ${WHITE}Exitting the tool..${WHITE}"
-    		echo
+			echo -e "${RED}[!] ${WHITE}Exitting the tool..${WHITE}"
+			echo
 
-    		exit 0
+			exit 0
 			;;
-        esac
-    else
-        script_args+=("${!OPTIND}")
-        ((OPTIND++))
-    fi
+		esac
+	else
+		script_args+=("${!OPTIND}")
+		((OPTIND++))
+	fi
 done
 
 CURRENT_LOCATION=$(pwd)

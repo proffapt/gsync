@@ -3,7 +3,7 @@
 # Utility functions
 # <start>
 shellcheck() {
-    # Storing the path to shell config file in SHELL_file variable
+	# Storing the path to shell config file in SHELL_file variable
 	if [[ $SHELL_TYPE == fish ]]; then
 		SHELL_file=~/.config/fish/config.fish
 	elif [[ $SHELL_TYPE == bash ]]; then
@@ -30,8 +30,8 @@ manipulate_and_store_variables() {
 
 	## Extracting names of files and folders from given location :
 	SYNC_SCRIPT_location="$SCRIPT_LOCATION/lib/syncscript"
-    defaults_LOCATION="$SCRIPT_LOCATION/.defaults"
-    MODE="${script_args[@]}"
+	defaults_LOCATION="$SCRIPT_LOCATION/.defaults"
+	MODE="${script_args[@]}"
 	SHELL_LOCATION=$(echo "$SHELL")
 	SHELL_TYPE="${SHELL_LOCATION##*/}"
 	SYNC_SCRIPT="${SYNC_SCRIPT_location##*/}"
@@ -39,23 +39,23 @@ manipulate_and_store_variables() {
 	git_SYNC_SCRIPT_folder="$SYNC_SCRIPT_folder/.git" ## We got without a '/'
 	CONFIG_FILE="${CONFIG_FILE_location##*/}"
 
-    ## Sourcing .defaults file if -g arg is not given and it's not in default mode
-    if [[ "$GIT_MAIN_FOLDER_location" == "" ]] && [[ "$MODE" != default ]]; then
-        if [[ -f "$defaults_LOCATION" ]]; then
-            echo -e "${GREEN}[+] ${BLUE}Sourcing .defaults file${WHITE}"
+	## Sourcing .defaults file if -g arg is not given and it's not in default mode
+	if [[ "$GIT_MAIN_FOLDER_location" == "" ]] && [[ "$MODE" != default ]]; then
+		if [[ -f "$defaults_LOCATION" ]]; then
+			echo -e "${GREEN}[+] ${BLUE}Sourcing .defaults file${WHITE}"
 
-            source "$defaults_LOCATION"
-        else
-            banner
+			source "$defaults_LOCATION"
+		else
+			banner
 
-        	echo -e "${RED}ERROR: ${GREEN}-g${BLUE} arg not specified, neither .defaults file exists${WHITE}"
-            _EXIT_
-        fi
-    fi
+			echo -e "${RED}ERROR: ${GREEN}-g${BLUE} arg not specified, neither .defaults file exists${WHITE}"
+			_EXIT_
+		fi
+	fi
 
 	execute_syncscript="$SYNC_SCRIPT_location -c $CONFIG_FILE -g $GIT_MAIN_FOLDER_location"
-	
-    ## Handling with and without '/' input to -g arg
+
+	## Handling with and without '/' input to -g arg
 	check_SLASH="${GIT_MAIN_FOLDER_location##*/}"
 	if [[ $check_SLASH == "" ]]; then
 		## We got with a '/'

@@ -11,7 +11,7 @@ CYAN=$(tput setaf 6)
 WHITE=$(tput setaf 7)
 ORANGE=$(tput setaf 9)
 
-## BANNER 
+## BANNER
 
 BANNER="$(clear)
               #############################################################################################

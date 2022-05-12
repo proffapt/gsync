@@ -43,7 +43,7 @@ delete_git_folder_and_repo() {
 }
 
 delete_alias() {
-    ## Checking whether the specified remote repo alias exists or not
+	## Checking whether the specified remote repo alias exists or not
 	ALIAS_TEST=$(cat "$SHELL_file" | grep -q "$ALIAS"= && echo 69)
 
 	if [[ $ALIAS_TEST == 69 ]]; then
