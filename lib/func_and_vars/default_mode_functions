@@ -14,4 +14,36 @@ write_defaults() {
 	echo GIT_MAIN_FOLDER_location="$GIT_MAIN_FOLDER_location" >"$defaults_LOCATION"
 	echo
 }
+
+setup_default_options(){
+	defaults_LOCATION=$SCRIPT_LOCATION/.defaults
+	if [[ "$GIT_MAIN_FOLDER_location" != "" ]]; then
+		if [[ ! -f "$defaults_LOCATION" ]]; then
+			echo -e "${GREEN}[+] ${BLUE}Creating .defaults file and writing into .it for the first time${WHITE}"
+
+			write_defaults
+		else
+			echo -e "${CYAN}[~] ${BLUE}.defaults file already exists with following content${WHITE}"
+			echo
+			cat "$defaults_LOCATION"
+			echo
+
+			read -rp "$(echo -e "${GREEN}[*] ${CYAN}Do you want to over-write the contents of .defaults file? [y/n]: ${WHITE} ")" ICCHA
+
+			if [[ "$ICCHA" == y ]]; then
+				echo -e "${GREEN}[+] ${BLUE}Over-writing .defaults file with new entry${WHITE}"
+
+				write_defaults
+			elif [[ "$ICCHA" == n ]]; then
+				echo -e "${CYAN}[~] ${BLUE}Skipping over-writing of .defaults file${WHITE}"
+				echo
+			else
+				ERROR_invalid_input
+			fi
+		fi
+	else
+		echo -e "${YELLOW}[-] ${GREEN}-g${BLUE} arg not specified${WHITE}"
+		echo
+	fi
+}
 # </start>
