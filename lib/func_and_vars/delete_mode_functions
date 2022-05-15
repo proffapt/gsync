@@ -28,15 +28,34 @@ put_back_config_file() {
 
 delete_git_folder_and_repo() {
 	if [[ -d "$GIT_MAIN_FOLDER_location" ]]; then
-		echo -e "${GREEN}[+] ${BLUE}Deleting the github repository containing configuration file${WHITE}"
-
 		cd "$GIT_MAIN_FOLDER_location" || exit
-		gh repo delete --confirm
-		cd "$CURRENT_LOCATION" || exit
 
-		echo -e "${GREEN}[+] ${BLUE}Deleting the github folder containing configuration file from your local machine${WHITE}"
+		echo -e "${GREEN}[+] ${BLUE}Listing all files in the github folder${WHITE}"
+		ls -la
+		read -rp "$(echo -e "${GREEN}[*] ${CYAN}Do you still want to delete this folder and the remote repository? [y/n]:${WHITE} ")" DELETE_GIT_REPO
 
-		rm -rf "$GIT_MAIN_FOLDER_location"
+		if [[ $DELETE_GIT_REPO == y ]]; then
+			echo -e "${GREEN}[+] ${BLUE}Deleting the github repository containing configuration file${WHITE}"
+			gh repo delete --confirm
+
+			cd "$CURRENT_LOCATION" || exit
+
+			echo -e "${GREEN}[+] ${BLUE}Deleting the github folder containing configuration file from your local machine${WHITE}"
+			rm -rf "$GIT_MAIN_FOLDER_location"
+		elif [[ $DELETE_GIT_REPO == n ]]; then
+			echo -e "${YELLOW}[-] ${BLUE}Not deleting the github repo and the folder${WHITE}"
+
+			echo -e "${GREEN}[+] ${BLUE}Updating the remote repo${WHITE}"
+			rm $CONFIG_FILE
+			git add $CONFIG_FILE
+			git commit -m "Removing $CONFIG_FILE via gsync by @proffapt"
+			git push origin main
+			cd "$CURRENT_LOCATION" || exit
+		else
+			cd "$CURRENT_LOCATION" || exit
+
+			ERROR_invalid_input
+		fi
 	else
 		echo -e "${YELLOW}[-] ${BLUE}Github folder supposed to be containing configuration file doesn't exist!${WHITE}"
 	fi
