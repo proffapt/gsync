@@ -20,7 +20,7 @@ put_back_config_file() {
 	if [[ -f "$new_CONFIG_FILE_LOCATION" ]]; then
 		echo -e "${GREEN}[+] ${BLUE}Putting configuration file back to it's original location from github folder${WHITE}"
 
-		cp "$new_CONFIG_FILE_LOCATION" "$CONFIG_FILE_location"
+		mv "$new_CONFIG_FILE_LOCATION" "$CONFIG_FILE_location"
 	else
 		echo -e "${YELLOW}[-] ${BLUE}Configuration file doesn't exist in the github folder!${WHITE}"
 	fi
@@ -30,11 +30,9 @@ delete_git_folder_and_repo() {
 	if [[ -d "$GIT_MAIN_FOLDER_location" ]]; then
 		cd "$GIT_MAIN_FOLDER_location" || exit
 
-		echo -e "${GREEN}[+] ${BLUE}Listing all files in the github folder${WHITE}"
-		ls -la
-		read -rp "$(echo -e "${GREEN}[*] ${CYAN}Do you still want to delete this folder and the remote repository? [y/n]:${WHITE} ")" DELETE_GIT_REPO
+		FILE_COUNT=$(find . ! \( -name . -o -name .. -o -name .git -o -name README.md \) -maxdepth 1 | grep -e "^" -c)
 
-		if [[ $DELETE_GIT_REPO == y ]]; then
+		if [[ $FILE_COUNT != 1 ]]; then
 			echo -e "${GREEN}[+] ${BLUE}Deleting the github repository containing configuration file${WHITE}"
 			gh repo delete --confirm
 
@@ -42,19 +40,16 @@ delete_git_folder_and_repo() {
 
 			echo -e "${GREEN}[+] ${BLUE}Deleting the github folder containing configuration file from your local machine${WHITE}"
 			rm -rf "$GIT_MAIN_FOLDER_location"
-		elif [[ $DELETE_GIT_REPO == n ]]; then
-			echo -e "${YELLOW}[-] ${BLUE}Not deleting the github repo and the folder${WHITE}"
+		else
+			echo -e "${CYAN}[~] ${BLUE}Detected more than one configuration file in the github folder${WHITE}"
+			echo -e "${YELLOW}[-] ${BLUE}Skipping deletion of github repo and the folder${WHITE}"
 
 			echo -e "${GREEN}[+] ${BLUE}Updating the remote repo${WHITE}"
-			rm $CONFIG_FILE
 			git add $CONFIG_FILE
 			git commit -m "Removing $CONFIG_FILE via gsync by @proffapt"
 			git push origin main
-			cd "$CURRENT_LOCATION" || exit
-		else
-			cd "$CURRENT_LOCATION" || exit
 
-			ERROR_invalid_input
+			cd "$CURRENT_LOCATION" || exit
 		fi
 	else
 		echo -e "${YELLOW}[-] ${BLUE}Github folder supposed to be containing configuration file doesn't exist!${WHITE}"
