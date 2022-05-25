@@ -2,28 +2,6 @@
 
 # Utility functions
 # <start>
-shellcheck() {
-	# Storing the path to shell config file in SHELL_file variable
-	if [[ $SHELL_TYPE == fish ]]; then
-		SHELL_file=~/.config/fish/config.fish
-	elif [[ $SHELL_TYPE == bash ]]; then
-		SHELL_file=~/.bashrc
-	elif [[ $SHELL_TYPE == zsh ]]; then
-		SHELL_file=~/.zshrc
-	elif [[ $SHELL_TYPE == tcsh ]]; then
-		SHELL_file=~/.tcshrc
-	elif [[ $SHELL_TYPE == sh ]]; then
-		SHELL_file=~/.profile
-	elif [[ $SHELL_TYPE == csh ]]; then
-		SHELL_file=~/.cshrc
-	elif [[ $SHELL_TYPE == ksh ]]; then
-		SHELL_file=~/.kshrc
-	else
-		echo -e "${RED}ERROR${WHITE}: You are using unsupported shell type! - '${ORANGE}$SHELL_TYPE${WHITE}'"
-		_EXIT_
-	fi
-}
-
 manipulate_and_store_variables() {
 	## Script execution location and script presence location:
 	CURRENT_LOCATION=$(pwd)
@@ -32,8 +10,6 @@ manipulate_and_store_variables() {
 	SYNC_SCRIPT_location="$SCRIPT_LOCATION/lib/syncscript"
 	defaults_LOCATION="$SCRIPT_LOCATION/.defaults"
 	MODE="${script_args[@]}"
-	SHELL_LOCATION=$(echo "$SHELL")
-	SHELL_TYPE="${SHELL_LOCATION##*/}"
 	SYNC_SCRIPT="${SYNC_SCRIPT_location##*/}"
 	SYNC_SCRIPT_folder="${SYNC_SCRIPT_location%/*}"
 	git_SYNC_SCRIPT_folder="$SYNC_SCRIPT_folder/.git" ## We got without a '/'
@@ -53,16 +29,16 @@ manipulate_and_store_variables() {
 		fi
 	fi
 
-	execute_syncscript="$SYNC_SCRIPT_location -c $CONFIG_FILE -g $GIT_MAIN_FOLDER_location"
-
 	## Handling with and without '/' input to -g arg
 	check_SLASH="${GIT_MAIN_FOLDER_location##*/}"
 	if [[ $check_SLASH == "" ]]; then
 		## We got with a '/'
 		new_CONFIG_FILE_LOCATION="$GIT_MAIN_FOLDER_location$CONFIG_FILE"
+		GSYNC_INIT="$GIT_MAIN_FOLDER_location.gsync_init"
 	else
 		## We got without '/'
 		new_CONFIG_FILE_LOCATION="$GIT_MAIN_FOLDER_location/$CONFIG_FILE"
+		GSYNC_INIT="$GIT_MAIN_FOLDER_location/.gsync_init"
 	fi
 }
 # </start>
