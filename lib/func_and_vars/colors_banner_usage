@@ -32,7 +32,7 @@ BANNER="$(clear)
 
 USAGE="$BANNER
 
-${BLUE}USAGE:${WHITE} $(basename "$0") [${ORANGE}delete/create/default${WHITE}] [${RED}-s${WHITE} ${CYAN}<path_to_syncscript>${WHITE}] [${RED}-a${WHITE} ${CYAN}<name_of_alias>${WHITE}] [${RED}-g${WHITE} ${CYAN}<path_to_github_folder>${WHITE}] [${RED}-c${WHITE} ${CYAN}<path_to_config_file>${WHITE}]
+${BLUE}USAGE:${WHITE} $(basename "$0") [${ORANGE}delete/create/default${WHITE}] [${RED}-g${WHITE} ${CYAN}<path_to_github_folder>${WHITE}] [${RED}-c${WHITE} ${CYAN}<path_to_config_file>${WHITE}]
 
 ${BLUE}where:${WHITE}
     ${RED}create${WHITE}  : Mode to setup auto-syncing
@@ -41,14 +41,12 @@ ${BLUE}where:${WHITE}
 
     ${RED}-c${WHITE} : Specify path of configuration file
     ${RED}-g${WHITE} : Specify path of dir which will be used as github's main dir for syncing
-    ${RED}-a${WHITE} : Specify alias to be used to edit the config file
     ${RED}-h${WHITE} : Show this help message
 ${RED}>>>> ${YELLOW}If something doesn't exist this tool will create that for you, if it already exists this tool will use that${WHITE}
 
 ${BLUE}Example(s):${WHITE}
-    $(basename "$0") ${ORANGE}create${WHITE} ${RED}-c${WHITE} ${CYAN}~/.bashrc${WHITE} ${RED}-g${WHITE} ${CYAN}~/Desktop/configs/bashrc/${WHITE} ${RED}-a${WHITE} ${CYAN}basrc.edit${WHITE}
-${ORANGE}>>>> ${YELLOW}Use ${GREEN}bashrc.edit ${YELLOW}to edit this config file in future; as you end editing, changes will be synced to your github repo${WHITE}
-    $(basename "$0") ${ORANGE}delete${WHITE} ${RED}-c${WHITE} ${CYAN}~/.bashrc${WHITE} ${RED}-g${WHITE} ${CYAN}~/Desktop/configs/bashrc/${WHITE} ${RED}-a${WHITE} ${CYAN}basrc.edit${WHITE} 
+    $(basename "$0") ${ORANGE}create${WHITE} ${RED}-c${WHITE} ${CYAN}~/.bashrc${WHITE} ${RED}-g${WHITE} ${CYAN}~/Desktop/configs/bashrc/${WHITE}
+    $(basename "$0") ${ORANGE}delete${WHITE} ${RED}-c${WHITE} ${CYAN}~/.bashrc${WHITE} ${RED}-g${WHITE} ${CYAN}~/Desktop/configs/bashrc/${WHITE} 
     $(basename "$0") ${ORANGE}default${WHITE} ${RED}-g${WHITE} ${CYAN}~/Desktop/configs/${WHITE}
     "
 
