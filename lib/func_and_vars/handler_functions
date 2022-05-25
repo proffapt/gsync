@@ -2,9 +2,6 @@
 
 # handler functions
 # <start>
-MSG_source_shell_config_file() {
-	echo -e "${CYAN}[^]${WHITE} ${YELLOW}Source your SHELL config file..${WHITE}"
-}
 
 _EXIT_() {
 	echo -e "${RED}[!] ${WHITE}Exitting the tool..${WHITE}"
