@@ -1,20 +1,11 @@
 #!/bin/bash
 
-# Colors
-RED=$(tput setaf 1)
-WHITE=$(tput setaf 7)
-
 while [ $OPTIND -le "$#" ]; do
-	if getopts c:g: input; then
+	if getopts d: input; then
 		case "${input}" in
 
-		c) _syncscript_CONFIG_FILE=${OPTARG} ;;
-		g) _syncscript_GIT_MAIN_FOLDER_location=${OPTARG} ;;
+		d) TARGETDIR=${OPTARG} ;;
 		*)
-			echo -e "${RED}ERROR${WHITE}: Invalid option given to syncscript: -'${ORANGE}$input${WHITE}'"
-			echo -e "${RED}[!] ${WHITE}Exitting the tool..${WHITE}"
-			echo
-
 			exit 0
 			;;
 		esac
@@ -24,36 +15,47 @@ while [ $OPTIND -le "$#" ]; do
 	fi
 done
 
-CURRENT_LOCATION=$(pwd)
+set -e
 
-cd "$_syncscript_GIT_MAIN_FOLDER_location" || exit
+stderr() {
+	echo "$1" >&2
+}
 
-check_CHANGES=$(git status --porcelain | grep -q "$_syncscript_CONFIG_FILE" && echo 69)
+is_command() {
+	command -v "$1" &>/dev/null
+}
 
-if [[ $check_CHANGES != 69 ]]; then
-	cd "$CURRENT_LOCATION" || exit
-
-	echo
-	tput setaf 2
-	echo ">> No changes were made"
-	echo
-	tput setaf 7
+if [ "$(uname)" != "Darwin" ]; then
+	INW="inotifywait"
+	EVENTS="close_write,move,delete,create"
+	INCOMMAND="\"$INW\" -qr -e \"$EVENTS\" --exclude \"\.git\" \"$TARGETDIR\""
 else
-	git add "$_syncscript_CONFIG_FILE"
-
-	echo
-	tput setaf 3
-	echo "> COMMITTING UPDATES"
-	echo -ne "$(tput setaf 7)"
-
-	git commit -m "updating $_syncscript_CONFIG_FILE via gsync syncscript by @proffapt"
-
-	echo -ne "$(tput setaf 2)"
-	echo "> PUSHING UPDATES"
-	echo -ne "$(tput setaf 7)"
-
-	git push -u origin 
-	cd "$CURRENT_LOCATION" || exit
-
-	echo
+	INW="fswatch"
+	# 414 = MovedTo + MovedFrom + Renamed + Removed + Updated + Created
+	#                = 256 + 128+ 16 + 8 + 4 + 2
+	EVENTS="--event=414"
+	INCOMMAND="\"$INW\" --recursive \"$EVENTS\" --exclude \"\.git\" --one-event \"$TARGETDIR\""
 fi
+
+for cmd in "git" "$INW" "timeout"; do
+	# in OSX: `timeout` => brew install coreutils
+	# in OSX: `fswatch` => brew install fswatch
+	is_command "$cmd" || {
+		stderr "Error: Required command '$cmd' not found"
+		exit 1
+	}
+done
+
+cd "$TARGETDIR"
+echo "$INCOMMAND"
+
+while true; do
+	# Pausing the script for 5 seconds after each push
+	eval "timeout 5 $INCOMMAND" || true
+	STATUS=$(git status -s)
+	if [ -n "$STATUS" ]; then
+		git add .
+		git commit -m "updating via gsync-syncscript by @proffapt"
+		git push origin
+	fi
+done
