@@ -83,7 +83,10 @@ if [[ "$MODE" == "create" ]]; then
 	chmod +x "$SYNC_SCRIPT_location"
 
 	## Syncing the configuration file added in it's git folder using just created sync scripts..
-	configure_syncscript
+	configure_syncsript
+
+	## Pushing all the changes made to the fodler.. if any
+	git_push
 
 ## Creating the logic for undoing the mess the script made with create mode:
 elif [[ "$MODE" == "delete" ]]; then
