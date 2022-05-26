@@ -117,7 +117,6 @@ create_readme() {
 		echo -e "${YELLOW}[-] ${BLUE}README.md file already exists in the github folder!${WHITE}"
 	fi
 
-	git push --set-upstream origin $BRANCH
 	cd "$CURRENT_LOCATION" || exit
 }
 
@@ -126,6 +125,11 @@ move_config_to_git_folder() {
 		echo -e "${GREEN}[+] ${BLUE}Moving the configuration file to github folder${WHITE}"
 
 		mv "$CONFIG_FILE_location" "$GIT_MAIN_FOLDER_location"
+
+		cd "$GIT_MAIN_FOLDER_location" || exit
+		git add $CONFIG_FILE
+		git commit -m "initial commit for $CONFIG_FILE via gsync too by @proffapt"
+		cd "$CURRENT_LOCATION" || exit
 	else
 		echo -e "${YELLOW}[-] ${BLUE}Configuration file already exist in the github folder!${WHITE}"
 	fi
@@ -141,32 +145,66 @@ create_link_to_config() {
 	fi
 }
 
-create_alias() {
-	## Checking whether the specified remote repo alias exists or not
-	ALIAS_TEST=$(cat "$SHELL_file" | grep -q "$ALIAS"= && echo 69)
+configure_syncsript() {
+	if [[ ! -f $GSYNC_INIT ]]; then
+		echo -e "${GREEN}[+] ${BLUE}Configuring syncscript${WHITE}"
 
-	if [[ $ALIAS_TEST != 69 ]]; then
-		echo -e "${GREEN}[+] ${BLUE}Adding the alias to SHELL config file${WHITE}"
+		## create and initialise startup.sh for the very first successfull run
+		if [[ ! -f $STARTUP_SCRIPT ]]; then
+			echo "#!/bin/bash" > "$STARTUP_SCRIPT"
+			echo " " >> "$STARTUP_SCRIPT"
 
-		echo "alias $ALIAS='$TEXT_EDITOR $CONFIG_FILE_location && $execute_syncscript'" >>"$SHELL_file"
+			chmod +x "$STARTUP_SCRIPT"
+		fi
+
+		## adds the syncing command entry to that startup.sh file
+		echo "nohup $SYNC_SCRIPT_location -d $GIT_MAIN_FOLDER_location >/dev/null 2>&1 &" >> "$STARTUP_SCRIPT"
+		## executing the script again after editing it
+		"$STARTUP_SCRIPT"
+
+		## implementing logic for executing the startup script on every login
+		if [[ $KERNEL == "Darwin" ]]; then
+			## Method used for starting the startup.sh script on login: LaunchAgent
+			if [[ ! -f ~/Library/LaunchAgents/com.gsync-startup.plist ]]; then
+				cat <<- EOF > ~/Library/LaunchAgents/com.gsync-startup.plist
+					<?xml version="1.0" encoding="UTF-8"?>
+					<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+					<plist version="1.0">
+					<dict>
+							<key>Label</key>
+							<string>com.gsync-startup.app</string>
+							<key>Program</key>
+							<string>$STARTUP_SCRIPT</string>
+							<key>RunAtLoad</key>
+							<true/>
+						</dict>
+					</plist>
+				EOF
+			fi
+		else
+			## Method used for starting the startup.sh script on login: /etc/profile.d
+			cp "$STARTUP_SCRIPT" /etc/profile.d/gsync-startup.sh
+		fi
+
+		## keeping track whether this folder is being used once or more than once
+		cd "$GIT_MAIN_FOLDER_location" || exit 
+
+		echo "The existense of this file signifies that gsync was ran atleast once on this folder." > .gsync_init
+		echo ".gsync_init" >> .gitignore
+		git add .gitignore
+		git commit -m "initial commit for gitignore file via gsync tool by @proffapt"
+
+		cd "$CURRENT_LOCATION" || exit
 	else
-		echo -e "${YELLOW}[-] ${BLUE}Alias already exists in SHELL config file${WHITE}"
+		echo -e "${YELLOW}[-] ${BLUE}Syncscript already configured${WHITE}"
 	fi
 }
 
-sync_configuration_file() {
-	cd "$GIT_MAIN_FOLDER_location" || exit
-	check_CHANGES=$(git status --porcelain | grep -q "$CONFIG_FILE" && echo 69)
+git_push() {
+	echo -e "${GREEN}[+] ${BLUE}Pushing changes to github if any in the git folder${WHITE}"
 
-	if [[ "$check_CHANGES" != 69 ]]; then
-		echo -e "${YELLOW}[-] ${BLUE}There are no changes in configuration file, Skipping push to github${WHITE}"
-		echo
-	else
-		echo -e "${GREEN}[+] ${BLUE}Syncing the configuration file to github${WHITE}"
-
-		$execute_syncscript
-	fi
-
+	cd "$GIT_MAIN_FOLDER_location" || exit 
+	git push --set-upstream origin $BRANCH
 	cd "$CURRENT_LOCATION" || exit
 }
 # </start>
