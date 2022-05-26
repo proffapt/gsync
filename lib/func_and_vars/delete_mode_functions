@@ -4,8 +4,7 @@
 # <start>
 delete_link() {
 	if [[ -f "$CONFIG_FILE_location" ]]; then
-		if [[ -L "$CONFIG_FILE_location" ]]; then
-			echo -e "${GREEN}[+] ${BLUE}Removing configuration 'link file'${WHITE}"
+		if [[ -L "$CONFIG_FILE_location" ]]; then echo -e "${GREEN}[+] ${BLUE}Removing configuration 'link file'${WHITE}"
 
 			rm "$CONFIG_FILE_location"
 		else
@@ -30,13 +29,13 @@ delete_git_folder_and_repo() {
 	if [[ -d "$GIT_MAIN_FOLDER_location" ]]; then
 		cd "$GIT_MAIN_FOLDER_location" || exit
 
-		FILE_COUNT=$(find . ! \( -name . -o -name .. -o -name .git -o -name README.md \) -maxdepth 1 | grep -e "^" -c)
+		FILE_COUNT=$(find . ! \( -name . -o -name .. -o -name .git -o -name README.md -o -name .gsync_init -o -name .gitignore \) -maxdepth 1 | grep -e "^" -c)
 
 		## updating repo
 		echo -e "${GREEN}[+] ${BLUE}Updating the remote repo${WHITE}"
 		git add $CONFIG_FILE
 		git commit -m "Removing $CONFIG_FILE via gsync by @proffapt"
-		git push origin 
+		git push origin
 
 		## for further detecting the number of branches
 		echo -e "${GREEN}[+] ${BLUE}Updating remote branch list${WHITE}"
@@ -79,34 +78,54 @@ delete_git_folder_and_repo() {
 	fi
 }
 
-delete_alias() {
-	## Checking whether the specified remote repo alias exists or not
-	ALIAS_TEST=$(cat "$SHELL_file" | grep -q "$ALIAS"= && echo 69)
+deconfigure_syncsript(){
+	if [[ $FILE_COUNT == 0 ]]; then ## if there are no other file in the github folder: remove it's entry
+		## adding this check just to make the code robust in terms of functioning
+		ENTRY_TEST=$(grep "$STARTUP_SCRIPT" -ce "$GIT_MAIN_FOLDER_location")
 
-	if [[ $ALIAS_TEST == 69 ]]; then
-		echo -e "${GREEN}[+] ${BLUE}Removing the alias: $ALIAS from SHELL config file${WHITE}"
+		if [[ $ENTRY_TEST != 0 ]]; then
+			echo -e "${GREEN}[+] ${BLUE}Deleting folder's entry${WHITE}"
 
-		## Adding support for macOS and other linux distros.. since sed is a bit diff on BSD based distros.
-		KERNEL=$(uname -s)
-		if [[ $KERNEL == Darwin ]]; then
-			## Using this method to edit links also.. incase your configuration file is a link itself!
-			if [[ -L "$SHELL_file" ]]; then
-				SHELL_CONFIG=$(readlink "$SHELL_file")
-				sed -i '' "/alias $ALIAS/d" "$SHELL_CONFIG"
+			if [[ $KERNEL == "Darwin" ]]; then
+				## remove the entry of that github folder from startup.sh
+				## command specific to BSD sed
+				sed -i '' "\:$GIT_MAIN_FOLDER_location:d" "$STARTUP_SCRIPT"
+				## executing the script again after editing it
+				"$STARTUP_SCRIPT"
 			else
-				sed -i '' "/alias $ALIAS/d" "$SHELL_file"
+				## remove the entry of that github folder from startup.sh
+				## command specific to GNU sed
+				sed -i "\:^$GIT_MAIN_FOLDER_location:d" "$STARTUP_SCRIPT"
+
+				## copying the modified file without entry of that github folder
+				cp "$STARTUP_SCRIPT" /etc/profile.d/gsync-startup.sh
+				## executing the script again after editing it
+				/etc/profile.d/gsync-startup.sh
 			fi
 		else
-			## Using this method to edit links also.. incase your configuration file is a link itself!
-			if [[ -L "$SHELL_file" ]]; then
-				SHELL_CONFIG=$(readlink "$SHELL_file")
-				sed -i "/alias $ALIAS/d" "$SHELL_CONFIG"
-			else
-				sed -i "/alias $ALIAS/d" "$SHELL_file"
-			fi
+			echo -e "${YELLOW}[-] ${BLUE}Entry for the specified github folder already doesn't exist${WHITE}"
 		fi
-	else
-		echo -e "${YELLOW}[-] ${BLUE}Alias: $ALIAS doesn't exist in SHELL config file!${WHITE}"
+	else ## if there are other configuration files then skip the process of deletion of entry
+		echo -e "${YELLOW}[-] ${BLUE}Skipping deletion of this folder's entry${WHITE}"
+	fi
+
+	ENTRY_COUNT=$(grep "$STARTUP_SCRIPT" -ce "-d")
+
+	if [[ $ENTRY_COUNT == 0 ]]; then ## if it has exactly three lines: that is no entry
+		echo -e "${CYAN}[~] ${BLUE}No other entry detected${WHITE}"
+		echo -e "${GREEN}[+] ${BLUE}Removing startup script${WHITE}"
+
+		if [[ $KERNEL == "Darwin" ]]; then
+			## remove startup.sh and com.gsync-startup.plist
+			rm "$STARTUP_SCRIPT"
+			rm ~/Library/LaunchAgents/com.gsync-startup.plist
+		else
+			## remove startup.sh and gsync-startup.sh
+			rm "$STARTUP_SCRIPT"
+			rm /etc/profile.d/gsync-startup.sh
+		fi
+	else ## if the startup.sh has more than 3 lines
+		echo -e "${CYAN}[~] ${BLUE}Detected other entries${WHITE}"
+		echo -e "${YELLOW}[-] ${BLUE}Skipping removal of startup script${WHITE}"
 	fi
 }
-# </start>
