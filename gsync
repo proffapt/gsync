@@ -27,16 +27,15 @@ source "$SCRIPT_LOCATION/lib/func_and_vars/handler_functions"      # contains er
 source "$SCRIPT_LOCATION/lib/func_and_vars/create_mode_functions"  # everything used inside create mode
 source "$SCRIPT_LOCATION/lib/func_and_vars/delete_mode_functions"  # everything used inside delete mode
 source "$SCRIPT_LOCATION/lib/func_and_vars/default_mode_functions" # everything used inside default mode
-source "$SCRIPT_LOCATION/lib/func_and_vars/checks_vars_functions"  # contains shellcheck and manipulate_and_store_variables function
+source "$SCRIPT_LOCATION/lib/func_and_vars/vars_functions"  	   # contains shellcheck and manipulate_and_store_variables function
 # </start>
 
 while [ $OPTIND -le "$#" ]; do
-	if getopts c:g:a:h input; then
+	if getopts c:g:h input; then
 		case "${input}" in
 
 		c) CONFIG_FILE_location=${OPTARG} ;;
 		g) GIT_MAIN_FOLDER_location=${OPTARG} ;;
-		a) ALIAS=${OPTARG} ;;
 		h) echo "${USAGE}" && exit 0 ;;
 		*)
 			banner
@@ -83,14 +82,8 @@ if [[ "$MODE" == "create" ]]; then
 	## Just making sure syncscript is executable
 	chmod +x "$SYNC_SCRIPT_location"
 
-	## Updating the shell config file for the alias to edit(and update simultaneously) this config file
-	create_alias
-
 	## Syncing the configuration file added in it's git folder using just created sync scripts..
-	sync_configuration_file
-
-	## Message to ask the user to source their configuration file
-	MSG_source_shell_config_file
+	configure_syncscript
 
 ## Creating the logic for undoing the mess the script made with create mode:
 elif [[ "$MODE" == "delete" ]]; then
@@ -105,12 +98,8 @@ elif [[ "$MODE" == "delete" ]]; then
 	## Handling the config file in git folder and remote repo
 	delete_git_folder_and_repo
 
-	## Handling alias added into the SHELL config file
-	delete_alias
-
-	## Message to ask the user to source their configuration file
-	echo
-	MSG_source_shell_config_file
+	## Undoing any method used to make the scynscript run at login
+	deconfigure_syncsript
 
 ## Logic for storing default values
 elif [[ "$MODE" == "default" ]]; then
