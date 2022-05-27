@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Getting input for the directory to monitor on
+# Getting input for the directory to monitor
 while [ $OPTIND -le "$#" ]; do
 	if getopts d: input; then
 		case "${input}" in
@@ -36,7 +36,7 @@ if [ "$(uname)" != "Darwin" ]; then
 	TO="/usr/bin/timeout"
 	GIT="/usr/bin/git"
 else
-	# If not installed using brew change the location for fswatch binary
+	# If not installed using brew then change the location for fswatch binary
 	INW="/opt/homebrew/bin/fswatch"
 	# 414 = MovedTo + MovedFrom + Renamed + Removed + Updated + Created
 	#                = 256 + 128+ 16 + 8 + 4 + 2
@@ -62,7 +62,7 @@ echo "$INCOMMAND"
 
 while true; do
 	# time used is in seconds
-	eval "$TO 60 $INCOMMAND" || true
+	eval "$TO 5 $INCOMMAND" || true
 	STATUS=$(git status -s)
 	if [ -n "$STATUS" ]; then
 		$GIT add .
