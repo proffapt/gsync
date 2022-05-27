@@ -53,7 +53,6 @@ done
 ## These are stored in checks_vars_functions file under /lib/functions
 # <start>
 manipulate_and_store_variables
-shellcheck
 # </start>
 
 ## Creating the syncing files logic :
@@ -78,9 +77,6 @@ if [[ "$MODE" == "create" ]]; then
 
 	## Creating link to config file in original location
 	create_link_to_config
-
-	## Just making sure syncscript is executable
-	chmod +x "$SYNC_SCRIPT_location"
 
 	## Syncing the configuration file added in it's git folder using just created sync scripts..
 	configure_syncsript
