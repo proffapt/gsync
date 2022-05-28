@@ -60,13 +60,13 @@ gsync is a tool for those who like to sync their configuration files in real-tim
 * `create mode`:
 1. It checks for config file you specified, if it doesn't exist it will create it.
 2. Then it sets up the git folder locally and on github used to sync the config file, copies the earlier config file in here and creates a link to this config file in the original location, along with creating README.md file if it doesn't exist already.
-3. Now whenever you will use the specified alias, it will open your fav text editor, and after you finish editing, the sync script will sync the config file to the github repo every time you edit it..
+3. Now whenever you will edit the file, by any method, the sync script will sync the config file to the github repo along with beautifully logging the process..
 * `delete mode`:
 1. Reverses all the mess it made, putting back the config file where it was supposed to be, replacing the link, deleting the github folder.
 * `default mode`:
 1. Stores only the value for `-g` arg in a file inside the cloned repository folder and then sources it, obviously with some not so straight forward if-else nested conditions for various cases.
 
-**TIP**: Use it as a editor alias to open your fav editor and create your configuration file, it will do the job of syncing it to your github after you are done editing it.
+**TIP**: Use it as a editor alias to open your fav editor and create your configuration file, it will do the job of syncing it to your github and automate this process for future use after you are done editing it.
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -81,15 +81,7 @@ gsync is a tool for those who like to sync their configuration files in real-tim
 <div id="supports"></div>
 
 ### Supports:
-1. Shells
-    * `bash`
-    * `fish`
-    * `zsh`
-    * `sh`
-    * `csh`
-    * `ksh`
-    * `tcsh`
-2. OS(s)
+1. OS(s)
     * MacOS[`BSD` based]
     * any *nix[`GNU+Linux` and `Unix`]
 
@@ -97,7 +89,7 @@ gsync is a tool for those who like to sync their configuration files in real-tim
 
 ### Built With
 
-This project is made with following langs/frameworks.
+This project is made with:
 
 * Bash
 
@@ -112,7 +104,13 @@ To get a local copy up and running follow these simple steps.
 
 ### Prerequisites
 You will need to install the following dependencies for the project to work.
+* `fswatch` for osx; `inotify-tools` for GNU+Linux
+* `coretuils`; try `gnu-coreutils` if not found
 * `git`
+  ```sh
+  git config pull.rebase true
+  git config credential.helper store
+  ```
 * `gh`
   ```sh
   gh auth login
@@ -124,15 +122,17 @@ You will need to install the following dependencies for the project to work.
 ### Installation
 
 _Now since we are done with the setting up of environment suitable for the project to compile/run, let's install and configure the project on your system locally now._
-1. Clone the repo
+1. Clone the repo.
    ```sh
    git clone https://github.com/proffapt/gsync.git
    ```
-2. Make the script executable
+2. Make the script executable.
    ```sh
    cd ./gsync
    chmod +x ./gsync
+   echo "alias gsync='${pwd}/gsync'"
    ```
+3. Source your configuration file.
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -142,37 +142,39 @@ _Now since we are done with the setting up of environment suitable for the proje
 
 1. Execute the help menu for script
    ```sh
-   ./gsync -h
+   gsync -h
    ```
 <div align="center">
   <a href="https://github.com/proffapt/gsync">
-    <img src="images/help_help.png" alt="product screenshot">
+    <img src="images/help_v1-2.png" alt="product screenshot">
   </a>
 </div>
 
 2. Use cases for the script are as follows:
 * Create mode
   ```sh
-  gsync create -c ~/sandbox/gsync/config_file/config.file  -g ~/sandbox/gsync/github_folder -a test.e
+  gsync create -c ~/config.file  -g ~/configs
   ```
 
 * Delete mode
   ```sh
-  gsync delete -c ~/sandbox/gsync/config_file/config.file  -g ~/sandbox/gsync/github_folder -a test.e
+  gsync delete -c ~/config.file  -g ~/configs
   ```
 * Default mode
    ```sh
-   gsync default -g ~/sandbox/gsync/github_folder/
-   gsync create -c ~/sandbox/gsync/config_file/config.file -a test.e
-   gsync delete -c ~/sandbox/gsync/config_file/config.file -a test.e
+   gsync default -g ~/configs
+   gsync create -c ~/config.file
+   gsync delete -c ~/config.file
    ```
 
-3. Source your configuration file!
-4. Now if you used `create` mode, use the alias(`test.e` here) to edit your configuration file(`config.file` here), the sync script(`syncer` here)
-will do it's job and sync the configuration file to specified github repo.
-    ```sh
-    test.e
-    ```
+3. Now if you used `create` mode, edit your configuration file(`config.file` here), the syncscript will do it's job and sync the configuration file to specified github repo.
+
+4. To look into the logs of what's happening, or to debug any kind of issue; go to the gsync folder and paste this command
+   ```sh
+   less -R lib/logs/(nameofconfigfile).log 
+   or
+   tail -f lib/logs/(nameofconfigfile).log
+   ```
   
 #### * See output screenshots of various cases in [images](https://github.com/proffapt/gsync/tree/main/images) folder.
 
@@ -197,25 +199,21 @@ Don't forget to give the project a star! Thanks again!
 <!-- Changelog -->
 # Changelog
 
-## v1.1.4
+## v1.2
 
 ### Added or Changed
-- Added freedom to use or not use '/' after github folder name
-- Added in script git repo creation
-- More robust logic for github folder manipulation
-- More robust logic for alias management
-- Added banner
-- Added default mode to save some default input args
-- Adding support for more shells: `sh`, `csh`, `ksh` and `tcsh`
-- Implementing Universal syncscript for all configuration file
+- Completely new and robust logic for syncing changes
+
+         - Can sync changes even when done with GUI and CLI, by any process
+         - Leaves no dangling process.
+- Support for automatically starting the monitoring process on login
+- Elaborative and colorful logs in a separate log-file, cleared on every login
 
 ### Removed
 
-- Useless multiple occurences of code.. implementing DRY principle
-- `nvim` as dependency, now use your fav text editor
-- Removing git storage command from prerequisites
-- `-m` argument, use the mode name directly
-- logic for individual syncscript for every config file, `-s` arg discontinued
+- `-a` argument. No need for any alias now, edit however you want
+- Old one way method of editing and syncing files
+- Shell dependency
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
