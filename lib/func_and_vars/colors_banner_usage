@@ -14,19 +14,19 @@ ORANGE=$(tput setaf 9)
 ## BANNER
 
 BANNER="$(clear)
-              #############################################################################################
-              #                            ${YELLOW}gsync${WHITE} - ${BLUE}(Github sync configurer)${WHITE}                               #
-              #                                                                                           #
-              #    ${GREEN}Author${WHITE}: ${CYAN}Arpit Bhardwaj(proffapt)${WHITE}                                                       #
-              #    ${GREEN}Git(hub/lab)${WHITE}: ${CYAN}proffapt${WHITE}                                                                 #
-              #    ${GREEN}Twitter & Telegram${WHITE}: ${CYAN}@proffapt${WHITE}                                                          #
-              #    ${GREEN}Email${WHITE}: ${CYAN}proffapt@pm.me${WHITE}                                                                  #
-              #                                                                                           #
-              #           ${GREEN}License${WHITE}: ${CYAN}BSD License 2.0${WHITE}                                                        #
-              #                                                                                           #
-              #############################################################################################
+#############################################################################################
+#                            ${YELLOW}gsync${WHITE} - ${BLUE}(Github sync configurer)${WHITE}                               #
+#                                                                                           #
+#    ${GREEN}Author${WHITE}: ${CYAN}Arpit Bhardwaj(proffapt)${WHITE}                                                       #
+#    ${GREEN}Git(hub/lab)${WHITE}: ${CYAN}proffapt${WHITE}                                                                 #
+#    ${GREEN}Twitter & Telegram${WHITE}: ${CYAN}@proffapt${WHITE}                                                          #
+#    ${GREEN}Email${WHITE}: ${CYAN}proffapt@pm.me${WHITE}                                                                  #
+#                                                                                           #
+#           ${GREEN}License${WHITE}: ${CYAN}BSD License 2.0${WHITE}                                                        #
+#                                                                                           #
+#############################################################################################
 
-              ${YELLOW}Automate the unique process for syncing your config files from your local machine to github.${WHITE}"
+${YELLOW}Automate the unique process for syncing your config files from your local machine to github.${WHITE}"
 
 ## USAGE
 
@@ -42,7 +42,6 @@ ${BLUE}where:${WHITE}
     ${RED}-c${WHITE} : Specify path of configuration file
     ${RED}-g${WHITE} : Specify path of dir which will be used as github's main dir for syncing
     ${RED}-h${WHITE} : Show this help message
-${RED}>>>> ${YELLOW}If something doesn't exist this tool will create that for you, if it already exists this tool will use that${WHITE}
 
 ${BLUE}Example(s):${WHITE}
     $(basename "$0") ${ORANGE}create${WHITE} ${RED}-c${WHITE} ${CYAN}~/.bashrc${WHITE} ${RED}-g${WHITE} ${CYAN}~/Desktop/configs/bashrc/${WHITE}
