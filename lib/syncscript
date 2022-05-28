@@ -18,6 +18,8 @@ done
 
 set -e
 
+echo ">> DIRECTORY BEING MONITORED FOR CHANGES: $TARGETDIR"
+
 stderr() {
 	echo "$1" >&2
 }
@@ -58,15 +60,19 @@ for cmd in "$GIT" "$INW" "$TO"; do
 done
 
 cd "$TARGETDIR"
-echo "$INCOMMAND"
+echo ">> MONITORING COMMAND: $INCOMMAND"
 
 while true; do
 	# time used is in seconds
-	eval "$TO 5 $INCOMMAND" || true
+	echo ">> Scheduled check >> Next check after a minute"
+	eval "$TO 60 $INCOMMAND" || true
 	STATUS=$(git status -s)
 	if [ -n "$STATUS" ]; then
+		echo "********************* change detected *********************"
 		$GIT add .
 		$GIT commit -m "updating via gsync-syncscript by @proffapt"
 		$GIT push origin
+		echo "************************** synced *************************"
+		echo
 	fi
 done
