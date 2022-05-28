@@ -127,7 +127,7 @@ move_config_to_git_folder() {
 		mv "$CONFIG_FILE_location" "$GIT_MAIN_FOLDER_location"
 
 		cd "$GIT_MAIN_FOLDER_location" || exit
-		git add $CONFIG_FILE
+		git add "$CONFIG_FILE"
 		git commit -m "initial commit for $CONFIG_FILE via gsync too by @proffapt"
 		cd "$CURRENT_LOCATION" || exit
 	else
@@ -146,26 +146,97 @@ create_link_to_config() {
 }
 
 configure_syncsript() {
+	## Just making sure syncscript is executable
+	if [[ ! -x $SYNC_SCRIPT_location ]]; then
+		chmod +x "$SYNC_SCRIPT_location"
+	fi
+
 	if [[ ! -f $GSYNC_INIT ]]; then
 		echo -e "${GREEN}[+] ${BLUE}Configuring syncscript${WHITE}"
 
 		## create and initialise startup.sh for the very first successfull run
 		if [[ ! -f $STARTUP_SCRIPT ]]; then
-			echo "#!/bin/bash" > "$STARTUP_SCRIPT"
-			echo " " >> "$STARTUP_SCRIPT"
+			cat <<- EOF > "$STARTUP_SCRIPT"
+				#!/bin/bash
+				
+				## Separating every entry from this script
+				set -m 
+					
+				## Entries for github folder to be synced continuously via the syncscript by gsync
+			EOF
 
 			chmod +x "$STARTUP_SCRIPT"
 		fi
-
+		## Creating logs folder if it doesn't exist already
+		if [[ ! -d  $SCRIPT_LOCATION/lib/logs ]]; then
+			mkdir "$SCRIPT_LOCATION"/lib/logs
+		fi
 		## adds the syncing command entry to that startup.sh file
-		echo "nohup $SYNC_SCRIPT_location -d $GIT_MAIN_FOLDER_location >/dev/null 2>&1 &" >> "$STARTUP_SCRIPT"
-		## executing the script again after editing it
-		"$STARTUP_SCRIPT"
+		echo -e "${GREEN}[+] ${BLUE}Adding command entry to startup script${WHITE}"
+		echo "nohup $SYNC_SCRIPT_location -d $GIT_MAIN_FOLDER_location > ${SCRIPT_LOCATION}/lib/logs/${CONFIG_FILE}.log &" >> "$STARTUP_SCRIPT"
+
+		## handling previously running instances of the entry if any
+		PROCESS_COUNT=$(ps -ef | grep "$SYNC_SCRIPT_location -d $GIT_MAIN_FOLDER_location" | awk '{print $2}' | grep "^" -c)
+		for ((i=$PROCESS_COUNT; i>1; i--))
+		do
+			PID=$(ps -ef | grep "$SYNC_SCRIPT_location -d $GIT_MAIN_FOLDER_location" | awk 'NR==1{print $2}')
+			echo -e "${CYAN}>> ${WHITE}Terminating previously running instance(pid=$PID) of this entry"
+			kill "$PID"
+		done
+		if [[ $PROCESS_COUNT == 1 ]]; then
+			echo -e "${YELLOW}[-] ${BLUE}No running instance found for this entry${WHITE}"
+		fi
+		## executing the currently added entry
+		## calling the recent entry alone is beneficial, rather than calling the startup script again and creating multiple
+		## instances of other commands too
+		nohup "$SYNC_SCRIPT_location" -d "$GIT_MAIN_FOLDER_location" > "$SCRIPT_LOCATION"/lib/logs/"$CONFIG_FILE".log &
 
 		## implementing logic for executing the startup script on every login
 		if [[ $KERNEL == "Darwin" ]]; then
-			## Method used for starting the startup.sh script on login: LaunchAgent
+			## giving /bin/bash full disk access if not given already
+			BINBASH_CHECK=$(sqlite3 /Library/Application\ Support/com.apple.TCC/TCC.db 'select client from access where auth_value and service = "kTCCServiceSystemPolicyAllFiles"' | grep -iq "/bin/bash" && echo 1)
+			if [[ $BINBASH_CHECK != 1 ]]; then
+				clear
+				echo "${RED}[!] ${YELLOW}/bin/bash${CYAN} doesn't have ${YELLOW}Full Disk Access${CYAN} crucial for syncscript to start on login"
+				echo "
+				${RED}NOTE FROM THE DEVELOPER:${YELLOW}
+
+				Now don't cry for the fact that this script is asking you to do some clicks.. saying it was supposed to be fully automated process.
+				I can't help it, to automate the addition of this entry to FDA database via this script user needs to have SIP disabled,
+				which is not suggested in general and for those who don't even know what the actual fuck it is, just forget it.
+
+				This is a one time process, you won't be seeing this message again while using this script.. if you follow all the steps given below correctly.
+				"
+				echo "${GREEN}[+] ${BLUE}Follow the steps below to achieve the above task${WHITE}"
+
+				## printing out required steps (can't automate requires SIP disabled by default)
+				echo "
+				${YELLOW}1.${WHITE} System Preferences ${CYAN}->${WHITE} Security & Privacy ${CYAN}->${WHITE} Privacy ${CYAN}->${WHITE} Full Disk Access
+				${YELLOW}2.${WHITE} Click the '${GREEN}lock${WHITE}' in the lower left corner to allow changes
+				${YELLOW}3.${WHITE} Click on '${GREEN}+${WHITE}' button to open finder window
+				${YELLOW}4.${WHITE} Go to your ${ORANGE}root directory${WHITE} (named as Macintosh HD)
+				${YELLOW}5.${WHITE} Press '${CYAN}Cmd+Shift+.${WHITE}' key combination to show hidden files
+				${YELLOW}6.${WHITE} Go to ${ORANGE}bin${WHITE} folder and select ${ORANGE}bash${WHITE} inside it
+				${YELLOW}7.${WHITE} Click '${GREEN}open${WHITE}' on the bottom right corner to choose bash
+				${YELLOW}8.${WHITE} Close system Preferences.
+				"
+				read -rp "${CYAN}[^]${BLUE} Enter '${CYAN}proceed${BLUE}' to open System Preferences for you: ${WHITE}" PROCEED
+				if [[ $PROCEED != "proceed" ]]; then
+					echo "${RED}[!] ${WHITE}User denied to open System Preferences"
+					_EXIT_
+				else
+					open -a "System Preferences"
+					read -rp "${CYAN}[^]${BLUE} Enter '${CYAN}done${BLUE}' to proceed to next steps: ${WHITE}" DONE
+					if [[ $DONE != "done" ]]; then
+						echo "${RED}[!] ${WHITE}User did not complete the addition of ${YELLOW}/bin/bash${WHITE} to ${YELLOW}FDA database${WHITE}"
+						_EXIT_
+					fi
+				fi
+			fi
+
+
 			if [[ ! -f ~/Library/LaunchAgents/com.gsync-startup.plist ]]; then
+				## Method used for starting the startup.sh script on login: LaunchAgent
 				cat <<- EOF > ~/Library/LaunchAgents/com.gsync-startup.plist
 					<?xml version="1.0" encoding="UTF-8"?>
 					<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -207,6 +278,7 @@ configure_syncsript() {
 		git commit -m "initial commit for gitignore file via gsync tool by @proffapt"
 
 		cd "$CURRENT_LOCATION" || exit
+
 	else
 		echo -e "${YELLOW}[-] ${BLUE}Syncscript already configured${WHITE}"
 	fi
