@@ -1,21 +1,17 @@
 # Changelog
 
-## v1.1.4
+## v1.2
 
 ### Added or Changed
-- Added freedom to use or not use '/' after github folder name
-- Added in script git repo creation
-- More robust logic for github folder manipulation
-- More robust logic for alias management
-- Added banner
-- Added default mode to save some default input args
-- Adding support for more shells: `sh`, `csh`, `ksh` and `tcsh`
-- Implementing Universal syncscript for all configuration file
+- Completely new and robust logic for syncing changes
+
+         - Can sync changes even when done with GUI and CLI, by any process
+         - Leaves no dangling process.
+- Support for automatically starting the monitoring process on login
+- Elaborative and colorful logs in a separate log-file, cleared on every login
 
 ### Removed
 
-- Useless multiple occurences of code.. implementing DRY principle
-- `nvim` as dependency, now use your fav text editor
-- Removing git storage command from prerequisites
-- `-m` argument, use the mode name directly
-- logic for individual syncscript for every config file, `-s` arg discontinued
+- `-a` argument. No need for any alias now, edit however you want
+- Old one way method of editing and syncing files
+- Shell dependency
