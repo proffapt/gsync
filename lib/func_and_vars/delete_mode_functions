@@ -33,7 +33,7 @@ delete_git_folder_and_repo() {
 
 		## updating repo
 		echo -e "${GREEN}[+] ${BLUE}Updating the remote repo${WHITE}"
-		git add $CONFIG_FILE
+		git add "$CONFIG_FILE"
 		git commit -m "Removing $CONFIG_FILE via gsync by @proffapt"
 		git push origin
 
@@ -61,7 +61,7 @@ delete_git_folder_and_repo() {
 
 			echo -e "${GREEN}[+] ${BLUE}Deleting the branch containing the config file${WHITE}"
 			DEL_BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null)
-			git push --delete origin $DEL_BRANCH
+			git push --delete origin "$DEL_BRANCH"
 
 			cd "$CURRENT_LOCATION" || exit
 
@@ -90,8 +90,6 @@ deconfigure_syncsript(){
 				## remove the entry of that github folder from startup.sh
 				## command specific to BSD sed
 				sed -i '' "\:$GIT_MAIN_FOLDER_location:d" "$STARTUP_SCRIPT"
-				## executing the script again after editing it
-				"$STARTUP_SCRIPT"
 			else
 				## remove the entry of that github folder from startup.sh
 				## command specific to GNU sed
@@ -99,8 +97,20 @@ deconfigure_syncsript(){
 
 				## copying the modified file without entry of that github folder
 				cp "$STARTUP_SCRIPT" /etc/profile.d/gsync-startup.sh
-				## executing the script again after editing it
-				/etc/profile.d/gsync-startup.sh
+			fi
+
+			## killing the running process 
+			PROCESS_COUNT=$(ps -ef | grep "$SYNC_SCRIPT_location -d $GIT_MAIN_FOLDER_location" | awk '{print $2}' | grep "^" -c)
+			for ((i=$PROCESS_COUNT; i>1; i--))
+			do
+				PID=$(ps -ef | grep "$SYNC_SCRIPT_location -d $GIT_MAIN_FOLDER_location" | awk 'NR==1{print $2}')
+				echo -e "${CYAN}>> ${WHITE}Terminating previously running instance(pid=$PID) of this entry"
+				kill "$PID"
+				## Appending the termination message into the logs
+				echo "[${YELLOW}$(date)${WHITE}] [${RED}KILL${WHITE}] Terminated process runnning on PID=${CYAN}$PID${WHITE}" >> "$SCRIPT_LOCATION"/lib/logs/"$CONFIG_FILE".log
+			done
+			if [[ $PROCESS_COUNT == 1 ]]; then
+				echo -e "${YELLOW}[-] ${BLUE}No running instance found for this entry${WHITE}"
 			fi
 		else
 			echo -e "${YELLOW}[-] ${BLUE}Entry for the specified github folder already doesn't exist${WHITE}"
@@ -111,20 +121,20 @@ deconfigure_syncsript(){
 
 	ENTRY_COUNT=$(grep "$STARTUP_SCRIPT" -ce "-d")
 
-	if [[ $ENTRY_COUNT == 0 ]]; then ## if it has exactly three lines: that is no entry
-		echo -e "${CYAN}[~] ${BLUE}No other entry detected${WHITE}"
+	if [[ $ENTRY_COUNT == 0 ]]; then ## if it has no other entry than the deleted one
+		echo -e "${CYAN}[~] ${BLUE}No other entries detected${WHITE}"
 		echo -e "${GREEN}[+] ${BLUE}Removing startup script${WHITE}"
 
 		if [[ $KERNEL == "Darwin" ]]; then
 			## remove startup.sh and com.gsync-startup.plist
-			rm "$STARTUP_SCRIPT"
-			rm ~/Library/LaunchAgents/com.gsync-startup.plist
+			rm -f "$STARTUP_SCRIPT"
+			rm -f ~/Library/LaunchAgents/com.gsync-startup.plist
 		else
 			## remove startup.sh and gsync-startup.sh
-			rm "$STARTUP_SCRIPT"
-			rm /etc/profile.d/gsync-startup.sh
+			rm -f "$STARTUP_SCRIPT"
+			rm -f /etc/profile.d/gsync-startup.sh
 		fi
-	else ## if the startup.sh has more than 3 lines
+	else ## if the startup.sh has more than 1(which is deleted now) entry
 		echo -e "${CYAN}[~] ${BLUE}Detected other entries${WHITE}"
 		echo -e "${YELLOW}[-] ${BLUE}Skipping removal of startup script${WHITE}"
 	fi
