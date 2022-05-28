@@ -1,5 +1,16 @@
 #!/bin/bash
 
+## Colors
+
+RED=$(tput setaf 1)
+GREEN=$(tput setaf 2)
+YELLOW=$(tput setaf 3)
+BLUE=$(tput setaf 4)
+PURPLE=$(tput setaf 5)
+CYAN=$(tput setaf 6)
+WHITE=$(tput setaf 7)
+ORANGE=$(tput setaf 9)
+
 # Getting input for the directory to monitor
 while [ $OPTIND -le "$#" ]; do
 	if getopts d: input; then
@@ -18,7 +29,7 @@ done
 
 set -e
 
-echo ">> DIRECTORY BEING MONITORED FOR CHANGES: $TARGETDIR"
+echo "${GREEN}[+] ${CYAN}DIRECTORY BEING MONITORED FOR CHANGES: ${YELLOW}$TARGETDIR${WHITE}"
 
 stderr() {
 	echo "$1" >&2
@@ -54,25 +65,22 @@ for cmd in "$GIT" "$INW" "$TO"; do
 	# in OSX: `timeout` => brew install coreutils
 	# in OSX: `fswatch` => brew install fswatch
 	is_command "$cmd" || {
-		stderr "Error: Required command '$cmd' not found"
+		stderr "[${YELLOW}$(date)${WHITE}] [${RED}ERROR${WHITE}] Required command '$cmd' not found"
 		exit 1
 	}
 done
 
 cd "$TARGETDIR"
-echo ">> MONITORING COMMAND: $INCOMMAND"
+echo "${GREEN}[+] ${CYAN}MONITORING COMMAND: ${YELLOW}$INCOMMAND${WHITE}"
 
 while true; do
 	# time used is in seconds
-	echo ">> Scheduled check >> Next check after a minute"
 	eval "$TO 60 $INCOMMAND" || true
 	STATUS=$(git status -s)
 	if [ -n "$STATUS" ]; then
-		echo "********************* change detected *********************"
-		$GIT add .
-		$GIT commit -m "updating via gsync-syncscript by @proffapt"
-		$GIT push origin
-		echo "************************** synced *************************"
-		echo
+		echo "[${YELLOW}$(date)${WHITE}] [${CYAN}CHANGE DETECTED${WHITE}] Detected change(s) in the folder being monitored"
+		$GIT add . && echo "[${YELLOW}$(date)${WHITE}] [${GREEN}ADDED${WHITE}] Added the change(s) to staging area" || echo "[${YELLOW}$(date)${WHITE}] [${RED}ERROR${WHITE}] Failed to add the change(s) to staging area"
+		$GIT commit -m "updating via gsync-syncscript by @proffapt" && echo "[${YELLOW}$(date)${WHITE}] [${GREEN}COMMITTED${WHITE}] Successfully made commit for changed file(s)" || echo "[${YELLOW}$(date)${WHITE}] [${RED}ERROR${WHITE}] Failed to commit the change(s)"
+		$GIT push origin && echo "[${YELLOW}$(date)${WHITE}] [${GREEN}SYNCED${WHITE}] Successfully pushed changes to the repository" || echo "[${YELLOW}$(date)${WHITE}] [${RED}ERROR${WHITE}] Failed to push the change(s) to corresponding github repository"
 	fi
 done
