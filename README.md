@@ -32,8 +32,6 @@
       <a href="#about-the-project">About The Project</a>
       <ul>
         <li><a href="#why-linking-config-files-?">Why linking config files ?</a></li>
-        <li><a href="#supports">Supports</a></li>
-        <li><a href="#built-with">Built With</a></li>
       </ul>
     </li>
     <li>
@@ -69,25 +67,6 @@ GSYNC is a tool for those who like to sync their configuration files in real-tim
 - Suppose you wanna sync your .bashrc in `~/`, you will have to `git init` your `~/` which will show everywhere `(main)` in your terminal and might clash with your sub directories which are some local git projects, so yeah just move it somewhere else.. link that to original location and sync the file now
 
 <p align="right">(<a href="#top">back to top</a>)</p>
-
-<div id="supports"></div>
-
-### Supports:
-1. OS(s)
-    * MacOS[`BSD` based]
-    * any *nix[`GNU+Linux` and `Unix`] -- not fully supported yet, in development
-
-<p align="right">(<a href="#top">back to top</a>)</p>
-
-### Built With
-
-This project is made with:
-
-* Bash
-
-
-<p align="right">(<a href="#top">back to top</a>)</p>
-
 
 <!-- GETTING STARTED -->
 ## Getting Started
