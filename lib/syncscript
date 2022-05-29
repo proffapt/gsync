@@ -5,11 +5,8 @@
 RED=$(tput setaf 1)
 GREEN=$(tput setaf 2)
 YELLOW=$(tput setaf 3)
-BLUE=$(tput setaf 4)
-PURPLE=$(tput setaf 5)
 CYAN=$(tput setaf 6)
 WHITE=$(tput setaf 7)
-ORANGE=$(tput setaf 9)
 
 # Getting input for the directory to monitor
 while [ $OPTIND -le "$#" ]; do
@@ -81,6 +78,6 @@ while true; do
 		echo "[${YELLOW}$(date)${WHITE}] [${CYAN}CHANGE DETECTED${WHITE}] Detected change(s) in the folder being monitored"
 		$GIT add . && echo "[${YELLOW}$(date)${WHITE}] [${GREEN}ADDED${WHITE}] Added the change(s) to staging area" || echo "[${YELLOW}$(date)${WHITE}] [${RED}ERROR${WHITE}] Failed to add the change(s) to staging area"
 		$GIT commit -m "updating via gsync-syncscript by @proffapt" && echo "[${YELLOW}$(date)${WHITE}] [${GREEN}COMMITTED${WHITE}] Successfully made commit for changed file(s)" || echo "[${YELLOW}$(date)${WHITE}] [${RED}ERROR${WHITE}] Failed to commit the change(s)"
-		$GIT push origin && echo "[${YELLOW}$(date)${WHITE}] [${GREEN}SYNCED${WHITE}] Successfully pushed changes to the repository" || echo "[${YELLOW}$(date)${WHITE}] [${RED}ERROR${WHITE}] Failed to push the change(s) to corresponding github repository"
+		$GIT push origin && echo "[${YELLOW}$(date)${WHITE}] [${GREEN}SYNCED${WHITE}] Successfully pushed change(s) to the repository" || echo "[${YELLOW}$(date)${WHITE}] [${RED}ERROR${WHITE}] Failed to push the change(s) to corresponding github repository"
 	fi
 done
