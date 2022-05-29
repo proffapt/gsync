@@ -58,8 +58,8 @@ ${BLUE}where:${WHITE}
 ${BLUE}Example(s):${WHITE}
     $(basename "$0") [${ORANGE}create${WHITE}/${ORANGE}delete${WHITE}] ${RED}-c${WHITE} ${CYAN}~/.bashrc${WHITE} ${RED}-g${WHITE} ${CYAN}~/Desktop/configs/bashrc/${WHITE}
     $(basename "$0") ${ORANGE}default${WHITE} ${RED}-g${WHITE} ${CYAN}~/Desktop/configs/${WHITE}
-    $(basename "$0") ${ORANGE}clear-logs${WHITE} ${RED}-c${WHITE} [${CYAN}~/.bashrc${WHITE}/${CYAN}.bashrc${WHITE}/${CYAN}all${WHITE}]
-    $(basename "$0") ${ORANGE}logs${WHITE} ${RED}-c${WHITE} [${CYAN}~/.bashrc${WHITE}/${CYAN}.bashrc${WHITE}]
+    $(basename "$0") ${ORANGE}clear-logs${WHITE} ${RED}-g${WHITE} [${CYAN}~/.bashrc${WHITE}/${CYAN}.bashrc${WHITE}/${CYAN}all${WHITE}]
+    $(basename "$0") ${ORANGE}logs${WHITE} ${RED}-g${WHITE} [${CYAN}~/.bashrc${WHITE}/${CYAN}.bashrc${WHITE}]
     $(basename "$0") ${ORANGE}logs${WHITE}
     "
 

@@ -79,12 +79,12 @@ service_start(){
 					if [[ ${ENTRY_FOUND[$i]} == 0 ]]; then
 						START_SERVICE=$(awk "NR==$((7+i)){print}" "$STARTUP_SCRIPT")
 						eval "$START_SERVICE"
-						echo "  [${GREEN}STARTED${WHITE}] "
+						echo " [${GREEN}STARTED${WHITE}] "
 					fi
 				done
 			fi
 		else
-			"$STARTUP_SCRIPT" && echo -e " [${GREEN}STARTED${WHITE}]" || echo -e " [${RED}FAILED TO START${WHITE}]"
+			/bin/bash "$STARTUP_SCRIPT" && echo -e " [${GREEN}STARTED${WHITE}]" || echo -e " [${RED}FAILED TO START${WHITE}]"
 		fi
 		echo
 	fi
@@ -92,24 +92,15 @@ service_start(){
 
 service_stop(){
 	SERVICE_COUNT=$(ps -ef | grep "$SYNC_SCRIPT_location" | awk '{print $2}' | grep "^" -c)
-	_=$(( GINDEX = 1 ))
 	echo
-	for ((i=SERVICE_COUNT; i>1; i--))
+	for (( i=SERVICE_COUNT; i>1; i-- ))
 	do
 		PID=$(ps -ef | grep "$SYNC_SCRIPT_location" | awk 'NR==1{print $2}')
-		GIT_MAIN_FOLDER_location=$(ps -ef | grep "$SYNC_SCRIPT_location" | awk "NR==${GINDEX}{print \$11}")
+		GIT_MAIN_FOLDER_location=$(ps -ef | grep "$SYNC_SCRIPT_location" | awk "NR==1{print \$11}")
+		GIT_MAIN_FOLDER="${GIT_MAIN_FOLDER_location##*/}"
 		kill "$PID"
 		## Appending the termination message into the logs
-		## will give one more than the actual number of config files
-		CONFIG_COUNT=$(find "$GIT_MAIN_FOLDER_location" ! \( -name . -o -name .. -o -name .git -o -name README.md -o -name .gsync_init -o -name .gitignore \) -maxdepth 1 | grep -e "^" -c)
-		_=$(( CINDEX = 2 ))
-		for (( j=CONFIG_COUNT; j>1; j-- ))
-		do
-			CONFIG_FILE=$(find "$GIT_MAIN_FOLDER_location" ! \( -name . -o -name .. -o -name .git -o -name README.md -o -name .gsync_init -o -name .gitignore \) -maxdepth 1 | awk "NR==${CINDEX}{print \$1}")
-			CONFIG_FILE=${CONFIG_FILE##*/}
-			echo "[${YELLOW}$(date)${WHITE}] [${RED}KILL${WHITE}] Terminated process runnning on PID=${CYAN}$PID${WHITE}" >> "$SCRIPT_LOCATION"/lib/logs/"$CONFIG_FILE".log
-			_=$(( CINDEX = CINDEX + 1 ))
-		done
+		echo "[${YELLOW}$(date)${WHITE}] [${RED}KILL${WHITE}] Terminated process runnning on PID=${CYAN}$PID${WHITE}" >> "$SCRIPT_LOCATION"/lib/logs/"$GIT_MAIN_FOLDER".log
 	done
 	if [[ $SERVICE_COUNT == 1 ]]; then
 		echo -e " STATUS: [${RED}NOT RUNNING${WHITE}]"

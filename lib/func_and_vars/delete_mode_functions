@@ -107,7 +107,7 @@ deconfigure_syncsript(){
 				echo -e "${CYAN}>> ${WHITE}Terminating previously running instance(pid=$PID) of this entry"
 				kill "$PID"
 				## Appending the termination message into the logs
-				echo "[${YELLOW}$(date)${WHITE}] [${RED}KILL${WHITE}] Terminated process runnning on PID=${CYAN}$PID${WHITE}" >> "$SCRIPT_LOCATION"/lib/logs/"$GIT_MAIN_FOLDER".log
+				echo "[$(tput setaf 3)$(date)$(tput setaf 7)] [$(tput setaf 1)KILL$(tput setaf 7)] Terminated process runnning on PID=$(tput setaf 6)$PID$(tput setaf 7)" >> "$SCRIPT_LOCATION"/lib/logs/"$GIT_MAIN_FOLDER".log
 			done
 			if [[ $PROCESS_COUNT == 1 ]]; then
 				echo -e "${YELLOW}[-] ${BLUE}No running instance found for this entry${WHITE}"

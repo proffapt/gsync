@@ -173,7 +173,7 @@ configure_syncsript() {
 		fi
 		## adds the syncing command entry to that startup.sh file
 		echo -e "${GREEN}[+] ${BLUE}Adding command entry to startup script${WHITE}"
-		echo "nohup $SYNC_SCRIPT_location -d $GIT_MAIN_FOLDER_location > ${SCRIPT_LOCATION}/lib/logs/${CONFIG_FILE}.log &" >> "$STARTUP_SCRIPT"
+		echo "nohup $SYNC_SCRIPT_location -d $GIT_MAIN_FOLDER_location > ${SCRIPT_LOCATION}/lib/logs/${GIT_MAIN_FOLDER}.log &" >> "$STARTUP_SCRIPT"
 
 		## handling previously running instances of the entry if any
 		PROCESS_COUNT=$(ps -ef | grep "$SYNC_SCRIPT_location -d $GIT_MAIN_FOLDER_location" | awk '{print $2}' | grep "^" -c)
