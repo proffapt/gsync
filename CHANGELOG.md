@@ -1,6 +1,7 @@
+<!-- Changelog -->
 # Changelog
 
-## v1.2
+## v1.2.1
 
 ### Added or Changed
 - Completely new and robust logic for syncing changes
@@ -9,6 +10,7 @@
          - Leaves no dangling process.
 - Support for automatically starting the monitoring process on login
 - Elaborative and colorful logs in a separate log-file, cleared on every login
+- Super convenient logs and process/service management
 
 ### Removed
 
