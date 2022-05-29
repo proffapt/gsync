@@ -48,7 +48,7 @@ show_logs(){
 			exit 0
 		else
 			_=$(( WHICH_LOG = WHICH_LOG + 3 ))
-			LOG_FILE=$(ls -la ~/Desktop/utilities/gsync/lib/logs/ | awk "NR==$WHICH_LOG{print \$9}" )
+			LOG_FILE=$(ls -la $SCRIPT_LOCATION/lib/logs/ | awk "NR==$WHICH_LOG{print \$9}" )
 			clear
 			tail -f "$SCRIPT_LOCATION"/lib/logs/"$LOG_FILE"
 		fi
