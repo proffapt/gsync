@@ -29,7 +29,7 @@ delete_git_folder_and_repo() {
 	if [[ -d "$GIT_MAIN_FOLDER_location" ]]; then
 		cd "$GIT_MAIN_FOLDER_location" || exit
 
-		FILE_COUNT=$(find . ! \( -name . -o -name .. -o -name .git -o -name README.md -o -name .gsync_init -o -name .gitignore \) -maxdepth 1 | grep -e "^" -c)
+		FILE_COUNT=$(find . ! \( -name . -o -name .. -o -name .git -o -name README.md -o -name .gsync_init -o -name .gitignore \) -maxdepth 1 2>/dev/null | grep -e "^" -c)
 
 		## updating repo
 		echo -e "${GREEN}[+] ${BLUE}Updating the remote repo${WHITE}"
@@ -93,7 +93,7 @@ deconfigure_syncsript(){
 			else
 				## remove the entry of that github folder from startup.sh
 				## command specific to GNU sed
-				sed -i "\:^$GIT_MAIN_FOLDER_location:d" "$STARTUP_SCRIPT"
+				sed -i "\:$GIT_MAIN_FOLDER_location:d" "$STARTUP_SCRIPT"
 
 				## copying the modified file without entry of that github folder
 				cp "$STARTUP_SCRIPT" /etc/profile.d/gsync-startup.sh
