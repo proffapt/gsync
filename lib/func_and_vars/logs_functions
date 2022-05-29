@@ -20,7 +20,7 @@ show_logs(){
 
 
 		echo
-		echo "${GREEN}[+]${YELLOW} Listing config files being logged${WHITE}"
+		echo "${GREEN}[+]${YELLOW} Listing config containing folder(s) being logged${WHITE}"
 		echo
 		for (( i=LOG_COUNT; i>0; i-- ))
 		do
@@ -34,7 +34,7 @@ show_logs(){
 		echo "${CYAN}0)${WHITE} exit"
 
 		echo 
-		read -rp "${GREEN}[^]${YELLOW} Enter the number corresponding to the config file: ${WHITE}" WHICH_LOG
+		read -rp "${GREEN}[^]${YELLOW} Enter the number corresponding to the config folder: ${WHITE}" WHICH_LOG
 
 		if (( WHICH_LOG > LOG_COUNT )) || (( WHICH_LOG < 0 )); then
 			echo
@@ -56,7 +56,7 @@ show_logs(){
 	if [[ -f "$SCRIPT_LOCATION"/lib/logs/"$GIT_MAIN_FOLDER".log ]]; then
 		tail -f "$SCRIPT_LOCATION"/lib/logs/"$GIT_MAIN_FOLDER".log
 	else
-		echo "${YELLOW}[-]${WHITE} Logs for this config file DO NOT exist"
+		echo "${YELLOW}[-]${WHITE} Logs for this folder DO NOT exist"
 	fi
 }
 
@@ -73,7 +73,7 @@ clear_logs(){
 		if [[ -f "$SCRIPT_LOCATION"/lib/logs/"$GIT_MAIN_FOLDER".log ]]; then
 			rm "$SCRIPT_LOCATION"/lib/logs/"$GIT_MAIN_FOLDER".log && echo "${GREEN}[+] ${WHITE}Logs for the specified file are deleted successfully" || echo "${RED}[!]${WHITE} There was an error while deleting the logs for specified file"
 		else
-			echo "${YELLOW}[-]${WHITE} Logs for this config file have been deleted already"
+			echo "${YELLOW}[-]${WHITE} Logs for this config folder have been deleted already"
 		fi
 	fi
 }
