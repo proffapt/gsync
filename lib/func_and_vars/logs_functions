@@ -1,0 +1,80 @@
+#!/bin/bash
+
+## logs management functions
+#<start>
+show_logs(){
+	if [[ "$CONFIG_FILE_location" == "" ]]; then
+		if [[ ! -d "$SCRIPT_LOCATION"/lib/logs ]]; then
+			echo "${YELLLOW}[-]${WHITE} There is nothing being logged, what do you even wanna see ¯\_(ツ)_/¯"
+			_EXIT_
+		fi
+
+		if [[ $LOG_COUNT == 3 ]]; then
+			echo "${YELLOW}[-]${WHITE} There are no logs available. Logs folder is empty :/"
+			_EXIT_
+		fi
+
+		LOG_COUNT=$(ls -la "$SCRIPT_LOCATION"/lib/logs/ | wc -l)
+		_=$(( LOG_COUNT = LOG_COUNT - 3))
+		_=$((INDEX = 1))
+
+
+		echo
+		echo "${GREEN}[+]${YELLOW} Listing config files being logged${WHITE}"
+		echo
+		for (( i=LOG_COUNT; i>0; i-- ))
+		do
+			LINE=$((INDEX + 3)) 
+			LOG_FILE=$(ls -la "$SCRIPT_LOCATION"/lib/logs/ | awk "NR==$LINE{print \$9}" )
+			LOG_FILE=${LOG_FILE%.*}
+			echo "    ${CYAN}$INDEX)${WHITE} $LOG_FILE"
+			_=$(( INDEX = INDEX + 1 ))
+		done
+		echo 
+		echo "${CYAN}0)${WHITE} exit"
+
+		echo 
+		read -rp "${GREEN}[^]${YELLOW} Enter the number corresponding to the config file: ${WHITE}" WHICH_LOG
+
+		if (( WHICH_LOG > LOG_COUNT )) || (( WHICH_LOG < 0 )); then
+			echo
+			echo "${RED}[!]${WHITE}Are you blind? There's no file corresponding to this index ¯\_(ツ)_/¯"
+			echo
+			exit 0
+		elif [[ $WHICH_LOG == 0 ]]; then
+			echo
+			_EXIT_
+			exit 0
+		else
+			_=$(( WHICH_LOG = WHICH_LOG + 3 ))
+			LOG_FILE=$(ls -la ~/Desktop/utilities/gsync/lib/logs/ | awk "NR==$WHICH_LOG{print \$9}" )
+			clear
+			tail -f "$SCRIPT_LOCATION"/lib/logs/"$LOG_FILE"
+		fi
+	fi
+
+	if [[ -f "$SCRIPT_LOCATION"/lib/logs/"$CONFIG_FILE".log ]]; then
+		tail -f "$SCRIPT_LOCATION"/lib/logs/"$CONFIG_FILE".log
+	else
+		echo "${YELLOW}[-]${WHITE} Logs for this config file DO NOT exist"
+	fi
+}
+
+clear_logs(){
+	if [[ $CONFIG_FILE_location == "all" ]]; then
+		if [[ -d "$SCRIPT_LOCATION"/lib/logs ]]; then
+			rm -r "$SCRIPT_LOCATION"/lib/logs/ && echo "${GREEN}[+] ${WHITE}Logs folder deleted successfully" || echo "${RED}[!]${WHITE} There was an error while deleting the log folder"
+		else
+			echo "${YELLOW}[-]${WHITE} Logs folder has been deleted already"
+		fi
+	elif [[ $CONFIG_FILE_location == "" ]]; then
+		echo "${RED}[!]${WHITE} Specify the config file (${CYAN}name${WHITE}/${CYAN}full path${WHITE}) with ${CYAN}-c${WHITE} argument"
+	else
+		if [[ -f "$SCRIPT_LOCATION"/lib/logs/"$CONFIG_FILE".log ]]; then
+			rm "$SCRIPT_LOCATION"/lib/logs/"$CONFIG_FILE".log && echo "${GREEN}[+] ${WHITE}Logs for the specified file are deleted successfully" || echo "${RED}[!]${WHITE} There was an error while deleting the logs for specified file"
+		else
+			echo "${YELLOW}[-]${WHITE} Logs for this config file have been deleted already"
+		fi
+	fi
+}
+#</start>
