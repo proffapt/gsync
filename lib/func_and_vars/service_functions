@@ -1,0 +1,126 @@
+#!/bin/bash
+
+## service management functions
+#<start>
+service_status() {
+	SERVICE_COUNT=$(ps -ef | grep "$SYNC_SCRIPT_location" | awk '{print $2}' | grep "^" -c)
+	_=$(( SERVICE_COUNT = SERVICE_COUNT - 1 ))
+	ENTRY_COUNT=$(grep "$STARTUP_SCRIPT" -ce "-d")
+	echo
+	if [[ $SERVICE_COUNT == 0 ]]; then
+		echo -e " STATUS: [${RED}NOT RUNNING${WHITE}]
+		"
+		exit 0
+	fi
+	if [ "$SERVICE_COUNT" -lt "$ENTRY_COUNT" ]; then
+		echo -e " STATUS: [${YELLOW}PARTIALLY RUNNING${WHITE}]  PROCESS COUNT: [${CYAN}$SERVICE_COUNT${WHITE}/${CYAN}$ENTRY_COUNT${WHITE}]"
+	else
+		echo -e " STATUS: [${GREEN}RUNNING${WHITE}]  PROCESS COUNT: [${CYAN}$SERVICE_COUNT${WHITE}/${CYAN}$ENTRY_COUNT${WHITE}]"
+	fi
+
+	_=$(( INDEX = 1 ))
+	for (( i=SERVICE_COUNT; i>0; i--))
+	do
+		PID=$(ps -ef | grep "$SYNC_SCRIPT_location" | awk "NR==${INDEX}{print \$2}")
+		GIT_MAIN_FOLDER_location=$(ps -ef | grep "$SYNC_SCRIPT_location" | awk "NR==${INDEX}{print \$11}")
+
+		echo -e "   [${YELLOW}PID${CYAN}${WHITE} = ${CYAN}$PID${WHITE}]"
+		echo -e "     [${GREEN}MONITORING${WHITE}]: $GIT_MAIN_FOLDER_location"
+		_=$(( INDEX = INDEX + 1 ))
+	done
+	echo
+}
+
+service_start(){
+	if [[ ! -f $STARTUP_SCRIPT ]]; then
+		echo "${RED}[!]${WHITE} No service(s) available currently to start"
+		_EXIT_
+	else
+		if [[ ! -d "$SCRIPT_LOCATION"/lib/logs ]]; then
+			mkdir "$SCRIPT_LOCATION"/lib/logs
+		fi
+
+		## Sophisticated check to see which services are running and starting only those which aren't running already
+		SERVICE_COUNT=$(ps -ef | grep "$SYNC_SCRIPT_location" | awk '{print $2}' | grep "^" -c)
+		echo
+		if [[ $SERVICE_COUNT != 1 ]]; then
+			## Matching with entries in startup script
+			ENTRY_COUNT=$(grep "$STARTUP_SCRIPT" -ce "-d")
+			if [[ $((SERVICE_COUNT - 1)) == "$ENTRY_COUNT" ]]; then
+				echo -e " STATUS: [${GREEN}RUNNING${WHITE}]"
+			else
+				_=$(( AINDEX = 7 ))
+				_=$(( PINDEX = 1 ))
+				ENTRY_FOUND=()
+				for (( i=0; i<ENTRY_COUNT; i++ ))
+				do
+					ENTRY_FOUND[$i]=0
+				done
+				_=$(( k = 0 ))
+				for (( i=ENTRY_COUNT; i>0; i-- ))
+				do
+					ENTRY=$(awk "NR==${AINDEX}{print \$4}" "$STARTUP_SCRIPT")
+					_=$(( PINDEX = 1 ))
+					for (( j=SERVICE_COUNT; j>1; j-- ))
+					do
+						PROCESS=$(ps -ef | grep "$SYNC_SCRIPT_location" | awk "NR==${PINDEX}{print \$11}")
+						if [[ $ENTRY == "$PROCESS" ]]; then
+							ENTRY_FOUND[$k]=1
+							_=$(( PINDEX = PINDEX + 1 ))
+							break
+						fi
+						_=$(( PINDEX = PINDEX + 1 ))
+					done
+					_=$(( AINDEX = AINDEX + 1 ))
+					_=$(( k = k + 1 ))
+				done
+				for (( i=0; i<ENTRY_COUNT; i++ ))
+				do
+					if [[ ${ENTRY_FOUND[$i]} == 0 ]]; then
+						START_SERVICE=$(awk "NR==$((7+i)){print}" "$STARTUP_SCRIPT")
+						eval "$START_SERVICE"
+						echo "  [${GREEN}STARTED${WHITE}] "
+					fi
+				done
+			fi
+		else
+			"$STARTUP_SCRIPT" && echo -e " [${GREEN}STARTED${WHITE}]" || echo -e " [${RED}FAILED TO START${WHITE}]"
+		fi
+		echo
+	fi
+}
+
+service_stop(){
+	SERVICE_COUNT=$(ps -ef | grep "$SYNC_SCRIPT_location" | awk '{print $2}' | grep "^" -c)
+	_=$(( GINDEX = 1 ))
+	echo
+	for ((i=SERVICE_COUNT; i>1; i--))
+	do
+		PID=$(ps -ef | grep "$SYNC_SCRIPT_location" | awk 'NR==1{print $2}')
+		GIT_MAIN_FOLDER_location=$(ps -ef | grep "$SYNC_SCRIPT_location" | awk "NR==${GINDEX}{print \$11}")
+		kill "$PID"
+		## Appending the termination message into the logs
+		## will give one more than the actual number of config files
+		CONFIG_COUNT=$(find "$GIT_MAIN_FOLDER_location" ! \( -name . -o -name .. -o -name .git -o -name README.md -o -name .gsync_init -o -name .gitignore \) -maxdepth 1 | grep -e "^" -c)
+		_=$(( CINDEX = 2 ))
+		for (( j=CONFIG_COUNT; j>1; j-- ))
+		do
+			CONFIG_FILE=$(find "$GIT_MAIN_FOLDER_location" ! \( -name . -o -name .. -o -name .git -o -name README.md -o -name .gsync_init -o -name .gitignore \) -maxdepth 1 | awk "NR==${CINDEX}{print \$1}")
+			CONFIG_FILE=${CONFIG_FILE##*/}
+			echo "[${YELLOW}$(date)${WHITE}] [${RED}KILL${WHITE}] Terminated process runnning on PID=${CYAN}$PID${WHITE}" >> "$SCRIPT_LOCATION"/lib/logs/"$CONFIG_FILE".log
+			_=$(( CINDEX = CINDEX + 1 ))
+		done
+	done
+	if [[ $SERVICE_COUNT == 1 ]]; then
+		echo -e " STATUS: [${RED}NOT RUNNING${WHITE}]"
+	else 
+		echo -e " [${GREEN}STOPPED${WHITE}]"
+	fi
+	echo
+}
+
+service_restart(){
+	service_stop
+	service_start
+}
+#</start>
