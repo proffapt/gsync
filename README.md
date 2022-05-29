@@ -12,7 +12,7 @@
   <h3 align="center">gsync</h3>
 
   <p align="center">
-    <i>Automate the unique process(by proffapt) for syncing your configuration from your local machine to github.</i>
+    <i>Automate the unique process(by me) for syncing your configuration from your local machine to github.</i>
     <br />
     <a href="https://github.com/proffapt/gsync"><strong>Explore the docs »</strong></a>
     <br />
@@ -56,15 +56,7 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-gsync is a tool for those who like to sync their configuration files in real-time to github, so how does it exactly do that? Read the code for detailed understanding.. but for an overview.. here's a short explaination:
-* `create mode`:
-1. It checks for config file you specified, if it doesn't exist it will create it.
-2. Then it sets up the git folder locally and on github used to sync the config file, copies the earlier config file in here and creates a link to this config file in the original location, along with creating README.md file if it doesn't exist already.
-3. Now whenever you will edit the file, by any method, the sync script will sync the config file to the github repo along with beautifully logging the process..
-* `delete mode`:
-1. Reverses all the mess it made, putting back the config file where it was supposed to be, replacing the link, deleting the github folder.
-* `default mode`:
-1. Stores only the value for `-g` arg in a file inside the cloned repository folder and then sources it, obviously with some not so straight forward if-else nested conditions for various cases.
+GSYNC is a tool for those who like to sync their configuration files in real-time to github, so how does it exactly do that? Read the code for detailed understanding.. from v1.2.1 it can be managed as if it is a kind of a service and has beautiful logs for every folder being monitored
 
 **TIP**: Use it as a editor alias to open your fav editor and create your configuration file, it will do the job of syncing it to your github and automate this process for future use after you are done editing it.
 
@@ -83,7 +75,7 @@ gsync is a tool for those who like to sync their configuration files in real-tim
 ### Supports:
 1. OS(s)
     * MacOS[`BSD` based]
-    * any *nix[`GNU+Linux` and `Unix`]
+    * any *nix[`GNU+Linux` and `Unix`] -- not fully supported yet, in development
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -105,7 +97,7 @@ To get a local copy up and running follow these simple steps.
 ### Prerequisites
 You will need to install the following dependencies for the project to work.
 * `fswatch` for osx; `inotify-tools` for GNU+Linux
-* `coretuils`; try `gnu-coreutils` if not found
+* `coretuils`
 * `git`
   ```sh
   git config pull.rebase true
@@ -123,16 +115,16 @@ You will need to install the following dependencies for the project to work.
 
 _Now since we are done with the setting up of environment suitable for the project to compile/run, let's install and configure the project on your system locally now._
 1. Clone the repo.
+2. Make the script executable.
+3. Add suitable alias for it.
    ```sh
    git clone https://github.com/proffapt/gsync.git
-   ```
-2. Make the script executable.
-   ```sh
    cd ./gsync
    chmod +x ./gsync
-   echo "alias gsync='${pwd}/gsync'"
+   echo "alias gsync='$PWD/gsync'"
    ```
-3. Source your configuration file.
+4. Add the echoed line to your shell config file.
+5. Finally, source your config file
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -142,11 +134,11 @@ _Now since we are done with the setting up of environment suitable for the proje
 
 1. Execute the help menu for script
    ```sh
-   gsync -h
+   gsync
    ```
 <div align="center">
   <a href="https://github.com/proffapt/gsync">
-    <img src="images/help_v1-2.png" alt="product screenshot">
+    <img src="images/help_v1-2-1.png" alt="product screenshot">
   </a>
 </div>
 
@@ -166,15 +158,24 @@ _Now since we are done with the setting up of environment suitable for the proje
    gsync create -c ~/config.file
    gsync delete -c ~/config.file
    ```
-
-3. Now if you used `create` mode, edit your configuration file(`config.file` here), the syncscript will do it's job and sync the configuration file to specified github repo.
-
-4. To look into the logs of what's happening, or to debug any kind of issue; go to the gsync folder and paste this command
+* Logs management
    ```sh
-   less -R lib/logs/(nameofconfigfile).log 
-   or
-   tail -f lib/logs/(nameofconfigfile).log
+   gsync clear-logs -g ~/configs
+   gsync clear-logs -g configs
+   gsync clear-logs -g all
+   gsync logs -g ~/configs
+   gsync logs -g configs
+   gsync logs
    ```
+* Service management
+   ```sh
+   gsync start
+   gsync stop
+   gsync restart
+   gsync status
+   ```
+   
+3. Now if you used `create` mode, edit your configuration file(`config.file` here), the syncscript will do it's job and sync the configuration file to specified github repo.
   
 #### * See output screenshots of various cases in [images](https://github.com/proffapt/gsync/tree/main/images) folder.
 
@@ -199,7 +200,7 @@ Don't forget to give the project a star! Thanks again!
 <!-- Changelog -->
 # Changelog
 
-## v1.2
+## v1.2.1
 
 ### Added or Changed
 - Completely new and robust logic for syncing changes
@@ -208,6 +209,7 @@ Don't forget to give the project a star! Thanks again!
          - Leaves no dangling process.
 - Support for automatically starting the monitoring process on login
 - Elaborative and colorful logs in a separate log-file, cleared on every login
+- Super convenient logs and process/service management
 
 ### Removed
 
@@ -245,6 +247,7 @@ Project Link: [https://github.com/proffapt/gsync](https://github.com/proffapt/gs
 * [GH manual](https://cli.github.com/manual/gh_repo_create)
 * [sed - BSD v/s GNU/Linux](https://unix.stackexchange.com/questions/401905/bsd-sed-vs-gnu-sed-and-i)
 * [Detect changes in git folder](https://stackoverflow.com/questions/13715544/shell-script-to-check-git-for-changes-and-then-loop-through-changed-files)
+* [Launchd - automate things at login for mac](https://stackoverflow.com/questions/6442364/running-script-upon-login-in-mac-os-x)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
