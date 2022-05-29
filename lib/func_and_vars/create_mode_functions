@@ -45,7 +45,7 @@ create_remote_github_repo() {
 		read -rp "$(echo -e "${GREEN}[*] ${CYAN}Enter the github repository name to be created and used ['owner/repo_name']:${WHITE} ")" NEW_ORIGIN
 		read -rp "$(echo -e "${GREEN}[*] ${CYAN}Specify the visibility to set for repository [public/private]:${WHITE} ")" VISIBILITY
 
-		gh repo create https://github.com/"$NEW_ORIGIN" --"$VISIBILITY" --description "Git repo for syncing $CONFIG_FILE in real-time"
+		gh repo create https://github.com/"$NEW_ORIGIN" --"$VISIBILITY" --description "Git repo for syncing $GIT_MAIN_FOLDER folder in real-time"
 		git remote add origin https://github.com/"$NEW_ORIGIN"
 	elif [[ $ANSWER == existing ]]; then
 		echo -e "${YELLOW}[-] ${BLUE}Skipping the creation of remote repository on github${WHITE}"
@@ -189,7 +189,7 @@ configure_syncsript() {
 		## executing the currently added entry
 		## calling the recent entry alone is beneficial, rather than calling the startup script again and creating multiple
 		## instances of other commands too
-		nohup "$SYNC_SCRIPT_location" -d "$GIT_MAIN_FOLDER_location" > "$SCRIPT_LOCATION"/lib/logs/"$CONFIG_FILE".log &
+		nohup "$SYNC_SCRIPT_location" -d "$GIT_MAIN_FOLDER_location" > "$SCRIPT_LOCATION"/lib/logs/"$GIT_MAIN_FOLDER".log &
 
 		## implementing logic for executing the startup script on every login
 		if [[ $KERNEL == "Darwin" ]]; then

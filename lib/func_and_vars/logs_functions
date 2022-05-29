@@ -53,8 +53,8 @@ show_logs(){
 		fi
 	fi
 
-	if [[ -f "$SCRIPT_LOCATION"/lib/logs/"$CONFIG_FILE".log ]]; then
-		tail -f "$SCRIPT_LOCATION"/lib/logs/"$CONFIG_FILE".log
+	if [[ -f "$SCRIPT_LOCATION"/lib/logs/"$GIT_MAIN_FOLDER".log ]]; then
+		tail -f "$SCRIPT_LOCATION"/lib/logs/"$GIT_MAIN_FOLDER".log
 	else
 		echo "${YELLOW}[-]${WHITE} Logs for this config file DO NOT exist"
 	fi
@@ -70,8 +70,8 @@ clear_logs(){
 	elif [[ $CONFIG_FILE_location == "" ]]; then
 		echo "${RED}[!]${WHITE} Specify the config file (${CYAN}name${WHITE}/${CYAN}full path${WHITE}) with ${CYAN}-c${WHITE} argument"
 	else
-		if [[ -f "$SCRIPT_LOCATION"/lib/logs/"$CONFIG_FILE".log ]]; then
-			rm "$SCRIPT_LOCATION"/lib/logs/"$CONFIG_FILE".log && echo "${GREEN}[+] ${WHITE}Logs for the specified file are deleted successfully" || echo "${RED}[!]${WHITE} There was an error while deleting the logs for specified file"
+		if [[ -f "$SCRIPT_LOCATION"/lib/logs/"$GIT_MAIN_FOLDER".log ]]; then
+			rm "$SCRIPT_LOCATION"/lib/logs/"$GIT_MAIN_FOLDER".log && echo "${GREEN}[+] ${WHITE}Logs for the specified file are deleted successfully" || echo "${RED}[!]${WHITE} There was an error while deleting the logs for specified file"
 		else
 			echo "${YELLOW}[-]${WHITE} Logs for this config file have been deleted already"
 		fi

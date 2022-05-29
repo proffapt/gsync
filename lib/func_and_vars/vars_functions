@@ -35,10 +35,13 @@ manipulate_and_store_variables() {
 		## We got with a '/'
 		new_CONFIG_FILE_LOCATION="$GIT_MAIN_FOLDER_location$CONFIG_FILE"
 		GSYNC_INIT="$GIT_MAIN_FOLDER_location.gsync_init"
+		GIT_MAIN_FOLDER="${GIT_MAIN_FOLDER_location#*/*/}"
+		GIT_MAIN_FOLDER="${GIT_MAIN_FOLDER%?}"
 	else
 		## We got without '/'
 		new_CONFIG_FILE_LOCATION="$GIT_MAIN_FOLDER_location/$CONFIG_FILE"
 		GSYNC_INIT="$GIT_MAIN_FOLDER_location/.gsync_init"
+		GIT_MAIN_FOLDER="${GIT_MAIN_FOLDER_location##*/}"
 	fi
 }
 # </start>
