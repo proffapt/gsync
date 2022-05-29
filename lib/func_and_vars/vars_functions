@@ -16,7 +16,7 @@ manipulate_and_store_variables() {
 	STARTUP_SCRIPT="$SCRIPT_LOCATION/lib/startup.sh"
 
 	## Sourcing .defaults file if -g arg is not given and it's not in default mode
-	if [[ "$GIT_MAIN_FOLDER_location" == "" ]] && [[ "$MODE" != default ]]; then
+	if [[ $GIT_MAIN_FOLDER_location == "" ]] && [[ $MODE != "default" ]] && [[ $MODE != "logs" ]] && [[ $MODE != "clear-logs" ]] && [[ $MODE != "start" ]] && [[ $MODE != "stop" ]] && [[ $MODE != "restart" ]] && [[ $MODE != "status" ]]; then
 		if [[ -f "$defaults_LOCATION" ]]; then
 			echo -e "${GREEN}[+] ${BLUE}Sourcing .defaults file${WHITE}"
 

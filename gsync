@@ -15,8 +15,7 @@
 #                  License: BSD License 2.0                                                                   #
 #                  Note: If You find any bugs in gsync, please REPORT it to me                                #
 #                  by creating an Issue; Or if you have a fix, create a Pull Request.                         #
-#                                                                                                             #
-###############################################################################################################
+#                                                                                                             # ###############################################################################################################
 
 ## Sourcing other script files
 # <start>
@@ -28,6 +27,8 @@ source "$SCRIPT_LOCATION/lib/func_and_vars/create_mode_functions"  # everything 
 source "$SCRIPT_LOCATION/lib/func_and_vars/delete_mode_functions"  # everything used inside delete mode
 source "$SCRIPT_LOCATION/lib/func_and_vars/default_mode_functions" # everything used inside default mode
 source "$SCRIPT_LOCATION/lib/func_and_vars/vars_functions"  	   # contains shellcheck and manipulate_and_store_variables function
+source "$SCRIPT_LOCATION/lib/func_and_vars/logs_functions"  	   # contains function related to logs management
+source "$SCRIPT_LOCATION/lib/func_and_vars/service_functions"  	   # contains function related to service management
 # </start>
 
 while [ $OPTIND -le "$#" ]; do
@@ -48,6 +49,10 @@ while [ $OPTIND -le "$#" ]; do
 		((OPTIND++))
 	fi
 done
+
+if [[ -z $* ]]; then
+	echo "$USAGE" && exit 0
+fi
 
 ## Calling utility functions
 ## These are stored in checks_vars_functions file under /lib/functions
@@ -109,6 +114,30 @@ elif [[ "$MODE" == "default" ]]; then
 
 	## storing the default value
 	setup_default_options
+
+## For showing logs of specific file
+elif [[ "$MODE" == "logs" ]]; then
+	show_logs
+
+## For deleting logs of specific file or all the files
+elif [[ "$MODE" == "clear-logs" ]]; then
+	clear_logs
+
+## For starting the syncing services of all files
+elif [[ "$MODE" == "start" ]]; then
+	service_start
+
+## For stoping the syncing services of all files
+elif [[ "$MODE" == "stop" ]]; then
+	service_stop
+
+## For restarting the syncing services of all files
+elif [[ "$MODE" == "restart" ]]; then
+	service_restart
+
+## For outputting status of the services
+elif [[ "$MODE" == "status" ]]; then
+	service_status
 
 ## The fuck you saying?
 else
