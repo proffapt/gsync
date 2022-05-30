@@ -83,6 +83,10 @@ You will need to install the following dependencies for the project to work.
   git config credential.helper store
   ```
 * `gh`
+  - Installation
+    - [OSX](https://cli.github.com/manual/installation)
+    - [Linux](https://github.com/cli/cli/blob/trunk/docs/install_linux.md)
+  - Configuration
   ```sh
   gh auth login
   gh auth refresh -h github.com -s delete_repo
@@ -126,17 +130,19 @@ _Now since we are done with the setting up of environment suitable for the proje
   ```sh
   gsync create -c ~/config.file  -g ~/configs
   ```
-
+  
 * Delete mode
   ```sh
   gsync delete -c ~/config.file  -g ~/configs
   ```
+  
 * Default mode
    ```sh
    gsync default -g ~/configs
    gsync create -c ~/config.file
    gsync delete -c ~/config.file
    ```
+   
 * Logs management
    ```sh
    gsync clear-logs -g ~/configs
@@ -146,13 +152,22 @@ _Now since we are done with the setting up of environment suitable for the proje
    gsync logs -g configs
    gsync logs
    ```
+   
 * Service management
    ```sh
    gsync start
    gsync stop
    gsync restart
    gsync status
+   gsync enable
+   gsync disable
    ```
+  
+* [**BONUS**] Folder Syncing :)
+  ```sh
+  gsync create -c ~/random.file -g ~/folder_to_sync
+  rm ~/folder_to_sync/random.file ~/random.file
+  ```
    
 3. Now if you used `create` mode, edit your configuration file(`config.file` here), the syncscript will do it's job and sync the configuration file to specified github repo.
   
