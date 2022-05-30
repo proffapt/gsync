@@ -81,24 +81,21 @@ delete_git_folder_and_repo() {
 deconfigure_syncsript(){
 	if [[ $FILE_COUNT == 0 ]]; then ## if there are no other file in the github folder: remove it's entry
 		## adding this check just to make the code robust in terms of functioning
-		ENTRY_TEST=$(grep "$STARTUP_SCRIPT" -ce "$GIT_MAIN_FOLDER_location")
+		ENTRY_TEST=$(grep "$SERVICES_SCRIPT" -ce "$GIT_MAIN_FOLDER_location")
 
 		if [[ $ENTRY_TEST != 0 ]]; then
 			echo -e "${GREEN}[+] ${BLUE}Deleting folder's entry${WHITE}"
 
 			if [[ $KERNEL == "Darwin" ]]; then
-				## remove the entry of that github folder from startup.sh
+				## remove the entry of that github folder from services script
 				## command specific to BSD sed
-				sed -i '' "\:$GIT_MAIN_FOLDER_location:d" "$STARTUP_SCRIPT"
+				sed -i '' "\:$GIT_MAIN_FOLDER_location:d" "$SERVICES_SCRIPT"
 			else
-				## remove the entry of that github folder from startup.sh
+				## remove the entry of that github folder from services script
 				## command specific to GNU sed
-				sed -i "\:$GIT_MAIN_FOLDER_location:d" "$STARTUP_SCRIPT"
+				sed -i "\:$GIT_MAIN_FOLDER_location:d" "$SERVICES_SCRIPT"
 				## Appending the termination message into the logs
 				echo "[$(tput setaf 3)$(date)$(tput setaf 7)] [$(tput setaf 1)KILL$(tput setaf 7)] Terminated the syncing process" >> "$SCRIPT_LOCATION"/lib/logs/"$GIT_MAIN_FOLDER".log
-
-				## copying the modified file without entry of that github folder
-				cp "$STARTUP_SCRIPT" /etc/profile.d/gsync-startup.sh
 			fi
 
 			## killing the running process 
@@ -123,23 +120,23 @@ deconfigure_syncsript(){
 		echo -e "${YELLOW}[-] ${BLUE}Skipping deletion of this folder's entry${WHITE}"
 	fi
 
-	ENTRY_COUNT=$(grep "$STARTUP_SCRIPT" -ce "-d")
+	ENTRY_COUNT=$(grep "$SERVICES_SCRIPT" -ce "-d")
 
 	if [[ $ENTRY_COUNT == 0 ]]; then ## if it has no other entry than the deleted one
 		echo -e "${CYAN}[~] ${BLUE}No other entries detected${WHITE}"
-		echo -e "${GREEN}[+] ${BLUE}Removing startup script${WHITE}"
+		echo -e "${GREEN}[+] ${BLUE}Removing services script${WHITE}"
 
 		if [[ $KERNEL == "Darwin" ]]; then
-			## remove startup.sh and com.gsync-startup.plist
-			rm -f "$STARTUP_SCRIPT"
+			## remove services script and com.gsync-startup.plist
+			rm -f "$SERVICES_SCRIPT"
 			rm -f ~/Library/LaunchAgents/com.gsync-startup.plist
 		else
-			## remove startup.sh and gsync-startup.sh
-			rm -f "$STARTUP_SCRIPT"
+			## remove services script and gsync-startup.sh
+			rm -f "$SERVICES_SCRIPT"
 			rm -f /etc/profile.d/gsync-startup.sh
 		fi
-	else ## if the startup.sh has more than 1(which is deleted now) entry
+	else ## if the services script has more than 1(which is deleted now) entry
 		echo -e "${CYAN}[~] ${BLUE}Detected other entries${WHITE}"
-		echo -e "${YELLOW}[-] ${BLUE}Skipping removal of startup script${WHITE}"
+		echo -e "${YELLOW}[-] ${BLUE}Skipping removal of services script${WHITE}"
 	fi
 }

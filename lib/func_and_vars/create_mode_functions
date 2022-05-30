@@ -154,9 +154,9 @@ configure_syncsript() {
 	if [[ ! -f $GSYNC_INIT ]]; then
 		echo -e "${GREEN}[+] ${BLUE}Configuring syncscript${WHITE}"
 
-		## create and initialise startup.sh for the very first successfull run
-		if [[ ! -f $STARTUP_SCRIPT ]]; then
-			cat <<- EOF > "$STARTUP_SCRIPT"
+		## create and initialise services script for the very first successfull run
+		if [[ ! -f $SERVICES_SCRIPT ]]; then
+			cat <<- EOF > "$SERVICES_SCRIPT"
 				#!/bin/bash
 				
 				## Separating every entry from this script
@@ -165,15 +165,15 @@ configure_syncsript() {
 				## Entries for github folder to be synced continuously via the syncscript by gsync
 			EOF
 
-			chmod +x "$STARTUP_SCRIPT"
+			chmod +x "$SERVICES_SCRIPT"
 		fi
 		## Creating logs folder if it doesn't exist already
 		if [[ ! -d  $SCRIPT_LOCATION/lib/logs ]]; then
 			mkdir "$SCRIPT_LOCATION"/lib/logs
 		fi
-		## adds the syncing command entry to that startup.sh file
-		echo -e "${GREEN}[+] ${BLUE}Adding command entry to startup script${WHITE}"
-		echo "nohup $SYNC_SCRIPT_location -d $GIT_MAIN_FOLDER_location > ${SCRIPT_LOCATION}/lib/logs/${GIT_MAIN_FOLDER}.log 2>/dev/null &" >> "$STARTUP_SCRIPT"
+		## adds the syncing command entry to that services file
+		echo -e "${GREEN}[+] ${BLUE}Adding command entry to services script${WHITE}"
+		echo "nohup $SYNC_SCRIPT_location -d $GIT_MAIN_FOLDER_location > ${SCRIPT_LOCATION}/lib/logs/${GIT_MAIN_FOLDER}.log 2>/dev/null &" >> "$SERVICES_SCRIPT"
 
 		## handling previously running instances of the entry if any
 		PROCESS_COUNT=$(ps -ef | grep "$SYNC_SCRIPT_location -d $GIT_MAIN_FOLDER_location" | awk '{print $2}' | grep "^" -c)
@@ -187,10 +187,21 @@ configure_syncsript() {
 			echo -e "${YELLOW}[-] ${BLUE}No running instance found for this entry${WHITE}"
 		fi
 		## executing the currently added entry
-		## calling the recent entry alone is beneficial, rather than calling the startup script again and creating multiple
+		## calling the recent entry alone is beneficial, rather than calling the services script again and creating multiple
 		## instances of other commands too
 		nohup "$SYNC_SCRIPT_location" -d "$GIT_MAIN_FOLDER_location" > "$SCRIPT_LOCATION"/lib/logs/"$GIT_MAIN_FOLDER".log 2>/dev/null &
 
+		## create and initialise startup.sh for the very first successfull run
+		if [[ ! -f $STARTUP_SCRIPT ]]; then
+			cat <<- EOF > "$STARTUP_SCRIPT"	
+				#!/bin/bash
+				
+				## This is more robust code written for starting services, preventing dangling services in any fucking case!
+				/bin/bash -c '$SCRIPT_LOCATION/gsync start'
+			EOF
+
+			chmod +x "$STARTUP_SCRIPT"
+		fi
 		## configuring services to autostart by default
 		service_enable
 

@@ -14,6 +14,7 @@ manipulate_and_store_variables() {
 	git_SYNC_SCRIPT_folder="$SYNC_SCRIPT_folder/.git" ## We got without a '/'
 	CONFIG_FILE="${CONFIG_FILE_location##*/}"
 	STARTUP_SCRIPT="$SCRIPT_LOCATION/lib/startup.sh"
+	SERVICES_SCRIPT="$SCRIPT_LOCATION/lib/services"
 
 	## Sourcing .defaults file if -g arg is not given and it's not in default mode
 	if [[ $GIT_MAIN_FOLDER_location == "" ]] && [[ $MODE != "default" ]] && [[ $MODE != "logs" ]] && [[ $MODE != "clear-logs" ]] && [[ $MODE != "start" ]] && [[ $MODE != "stop" ]] && [[ $MODE != "restart" ]] && [[ $MODE != "status" ]] && [[ $MODE != "enable" ]] && [[ $MODE != "disable" ]]; then
