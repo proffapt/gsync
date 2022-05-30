@@ -94,6 +94,8 @@ deconfigure_syncsript(){
 				## remove the entry of that github folder from startup.sh
 				## command specific to GNU sed
 				sed -i "\:$GIT_MAIN_FOLDER_location:d" "$STARTUP_SCRIPT"
+				## Appending the termination message into the logs
+				echo "[$(tput setaf 3)$(date)$(tput setaf 7)] [$(tput setaf 1)KILL$(tput setaf 7)] Terminated the syncing process" >> "$SCRIPT_LOCATION"/lib/logs/"$GIT_MAIN_FOLDER".log
 
 				## copying the modified file without entry of that github folder
 				cp "$STARTUP_SCRIPT" /etc/profile.d/gsync-startup.sh
@@ -107,7 +109,9 @@ deconfigure_syncsript(){
 				echo -e "${CYAN}>> ${WHITE}Terminating previously running instance(pid=$PID) of this entry"
 				kill "$PID"
 				## Appending the termination message into the logs
-				echo "[$(tput setaf 3)$(date)$(tput setaf 7)] [$(tput setaf 1)KILL$(tput setaf 7)] Terminated process runnning on PID=$(tput setaf 6)$PID$(tput setaf 7)" >> "$SCRIPT_LOCATION"/lib/logs/"$GIT_MAIN_FOLDER".log
+				if [[ $KERNEL == "Darwin" ]]; then
+					echo "[$(tput setaf 3)$(date)$(tput setaf 7)] [$(tput setaf 1)KILL$(tput setaf 7)] Terminated process runnning on PID=$(tput setaf 6)$PID$(tput setaf 7)" >> "$SCRIPT_LOCATION"/lib/logs/"$GIT_MAIN_FOLDER".log
+				fi
 			done
 			if [[ $PROCESS_COUNT == 1 ]]; then
 				echo -e "${YELLOW}[-] ${BLUE}No running instance found for this entry${WHITE}"
