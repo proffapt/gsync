@@ -28,6 +28,7 @@ service_status() {
 	else
 		echo -e " STATUS: [${GREEN}RUNNING${WHITE}]  PROCESS COUNT: [${CYAN}$SERVICE_COUNT${WHITE}/${CYAN}$ENTRY_COUNT${WHITE}]  STARTUP SERVICE: [$STARTUP_STATUS]"
 	fi
+	## printing running process
 	_=$(( INDEX = 1 ))
 	for (( i=SERVICE_COUNT; i>0; i--))
 	do
@@ -37,6 +38,41 @@ service_status() {
 		echo -e "   [${YELLOW}PID${CYAN}${WHITE} = ${CYAN}$PID${WHITE}]"
 		echo -e "     [${GREEN}MONITORING${WHITE}]: $GIT_MAIN_FOLDER_location"
 		_=$(( INDEX = INDEX + 1 ))
+	done
+	## printing terminated processess
+	_=$(( AINDEX = 7 ))
+	_=$(( PINDEX = 1 ))
+	ENTRY_FOUND=()
+	for (( i=0; i<ENTRY_COUNT; i++ ))
+	do
+		ENTRY_FOUND[$i]=0
+	done
+	_=$(( k = 0 ))
+	for (( i=ENTRY_COUNT; i>0; i-- ))
+	do
+		ENTRY=$(awk "NR==${AINDEX}{print \$4}" "$STARTUP_SCRIPT")
+		_=$(( PINDEX = 1 ))
+		for (( j=SERVICE_COUNT; j>0; j-- ))
+		do
+			PROCESS=$(ps -ef | grep "$SYNC_SCRIPT_location" | awk "NR==${PINDEX}{print \$11}")
+			if [[ $ENTRY == "$PROCESS" ]]; then
+				ENTRY_FOUND[$k]=1
+				_=$(( PINDEX = PINDEX + 1 ))
+				break
+			else
+				GIT_FOLDER[$k]=$ENTRY
+			fi
+			_=$(( PINDEX = PINDEX + 1 ))
+		done
+		_=$(( AINDEX = AINDEX + 1 ))
+		_=$(( k = k + 1 ))
+	done
+	for (( i=0; i<ENTRY_COUNT; i++ ))
+	do
+		if [[ ${ENTRY_FOUND[$i]} == 0 ]]; then
+			echo "   [${RED}TERMINATED${WHITE}] "
+			echo -e "     [${GREEN}MONITORING${WHITE}]: ${GIT_FOLDER[$i]}"
+		fi
 	done
 	echo
 }
