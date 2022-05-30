@@ -3,21 +3,31 @@
 ## service management functions
 #<start>
 service_status() {
+	## checking whether the startup services are enabled or disabled on login
+	STARTUP_STATUS="${RED}DISABLED${WHITE}"
+	if [[ $KERNEL == "Darwin" ]]; then
+		if [[ -f ~/Library/LaunchAgents/com.gsync-startup.plist ]]; then
+			STARTUP_STATUS="${GREEN}ENABLED${WHITE}"
+		fi
+	else
+		if [[ -f /etc/profile.d/gsync-startup.sh ]]; then
+			STARTUP_STATUS="${GREEN}ENABLED${WHITE}"
+		fi
+	fi
 	SERVICE_COUNT=$(ps -ef | grep "$SYNC_SCRIPT_location" | awk '{print $2}' | grep "^" -c)
 	_=$(( SERVICE_COUNT = SERVICE_COUNT - 1 ))
 	ENTRY_COUNT=$(grep "$STARTUP_SCRIPT" -ce "-d")
 	echo
 	if [[ $SERVICE_COUNT == 0 ]]; then
-		echo -e " STATUS: [${RED}NOT RUNNING${WHITE}]
+		echo -e " STATUS: [${RED}NOT RUNNING${WHITE}]  STARTUP SERVICE: [$STARTUP_STATUS]
 		"
 		exit 0
 	fi
 	if [ "$SERVICE_COUNT" -lt "$ENTRY_COUNT" ]; then
-		echo -e " STATUS: [${YELLOW}PARTIALLY RUNNING${WHITE}]  PROCESS COUNT: [${CYAN}$SERVICE_COUNT${WHITE}/${CYAN}$ENTRY_COUNT${WHITE}]"
+		echo -e " STATUS: [${YELLOW}PARTIALLY RUNNING${WHITE}]  PROCESS COUNT: [${CYAN}$SERVICE_COUNT${WHITE}/${CYAN}$ENTRY_COUNT${WHITE}]  STARTUP SERVICE: [$STARTUP_STATUS]"
 	else
-		echo -e " STATUS: [${GREEN}RUNNING${WHITE}]  PROCESS COUNT: [${CYAN}$SERVICE_COUNT${WHITE}/${CYAN}$ENTRY_COUNT${WHITE}]"
+		echo -e " STATUS: [${GREEN}RUNNING${WHITE}]  PROCESS COUNT: [${CYAN}$SERVICE_COUNT${WHITE}/${CYAN}$ENTRY_COUNT${WHITE}]  STARTUP SERVICE: [$STARTUP_STATUS]"
 	fi
-
 	_=$(( INDEX = 1 ))
 	for (( i=SERVICE_COUNT; i>0; i--))
 	do
