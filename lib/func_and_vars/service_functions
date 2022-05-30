@@ -70,7 +70,7 @@ service_status() {
 	for (( i=0; i<ENTRY_COUNT; i++ ))
 	do
 		if [[ ${ENTRY_FOUND[$i]} == 0 ]]; then
-			echo "   [${RED}TERMINATED${WHITE}] "
+			echo -e "   [${RED}TERMINATED${WHITE}] "
 			echo -e "     [${GREEN}MONITORING${WHITE}]: ${GIT_FOLDER[$i]}"
 		fi
 	done
@@ -269,6 +269,221 @@ service_disable() {
 			rm -f /etc/profile.d/gsync-startup.sh && echo -e "  STARTUP SERVICE: [${RED}DISABLED${WHITE}]" || echo -e "  STARTUP SERVICE: [${GREEN}ENABLED${WHITE}]"
 		else
 			echo -e "  STARTUP SERVICE: [${RED}DISABLED${WHITE}]"
+		fi
+	fi
+	echo
+}
+
+service_selective_stop() {
+	## Matching with entries in services script
+	SERVICE_COUNT=$(ps -ef | grep "$SYNC_SCRIPT_location" | awk '{print $2}' | grep "^" -c)
+	_=$(( SERVICE_COUNT = SERVICE_COUNT - 1 ))
+	ENTRY_COUNT=$(grep "$SERVICES_SCRIPT" -ce "-d")
+	echo
+	if [[ $SERVICE_COUNT == 0 ]]; then
+		echo "${YELLOW}[-] ${WHITE}No process is running for you to stop, control your emotions.."
+		_EXIT_
+	fi
+	echo -e "${GREEN}[+] ${YELLOW}Listing all running processes${WHITE}"
+	echo
+	_=$(( AINDEX = 7 ))
+	_=$(( PINDEX = 1 ))
+	ENTRY_FOUND=()
+	GIT_FOLDER=()
+	## initialising every element of entry_found with 0
+	for (( i=0; i<ENTRY_COUNT; i++ ))
+	do
+		ENTRY_FOUND[$i]=0
+	done
+	_=$(( k = 0 ))
+	for (( i=ENTRY_COUNT; i>0; i-- ))
+	do
+		ENTRY=$(awk "NR==${AINDEX}{print \$4}" "$SERVICES_SCRIPT")
+		_=$(( PINDEX = 1 ))
+		for (( j=SERVICE_COUNT; j>0; j-- ))
+		do
+			PROCESS=$(ps -ef | grep "$SYNC_SCRIPT_location" | awk "NR==${PINDEX}{print \$11}")
+			if [[ $ENTRY == "$PROCESS" ]]; then
+				ENTRY_FOUND[$k]=1
+				GIT_FOLDER[$k]=$ENTRY
+				_=$(( k = k + 1 ))
+				_=$(( PINDEX = PINDEX + 1 ))
+				break
+			fi
+			_=$(( PINDEX = PINDEX + 1 ))
+		done
+		_=$(( AINDEX = AINDEX + 1 ))
+	done
+	_=$(( j = 0 ))
+	for (( i=0; i<k; i++ ))
+	do
+		if [[ ${ENTRY_FOUND[$i]} == 1 ]]; then
+			echo -e "    ${CYAN}$((j + 1)))${WHITE} ${GIT_FOLDER[$i]}"
+			_=$(( j = j + 1 ))
+		fi
+	done
+	echo 
+	echo "${CYAN}0)${WHITE} exit"
+	echo
+	read -rp "${GREEN}[^]${YELLOW} Enter the number corresponding to the process [${WHITE}use ',' for separate and '-' for contnuous values${YELLOW}]: ${WHITE}" KILL_IT
+
+	echo
+	if [[ $KILL_IT == *","* ]] && [[ $KILL_IT != *"-"* ]]; then
+		NUMBER="${KILL_IT: -1}"
+		if (( NUMBER < SERVICE_COUNT + 1 )) && (( NUMBER > 0 )); then
+			PID=$(ps -ef | grep "$SYNC_SCRIPT_location -d ${GIT_FOLDER[$((KILL_IT - 1))]}" | awk "NR==1{print \$2}")
+			kill "$PID"
+			echo -e "   [${RED}TERMINATED${WHITE}] Process with PID=${CYAN}$PID${WHITE}"
+		fi
+		KILL_IT="${KILL_IT%?}"
+		while [[ $KILL_IT != "" ]]
+		do
+			KILL_IT="${KILL_IT%?}"
+			NUMBER="${KILL_IT: -1}"
+			if (( NUMBER < SERVICE_COUNT + 1 )) && (( NUMBER > 0 )); then
+				PID=$(ps -ef | grep "$SYNC_SCRIPT_location -d ${GIT_FOLDER[$((KILL_IT - 1))]}" | awk "NR==1{print \$2}")
+				kill "$PID"
+				echo -e "   [${RED}TERMINATED${WHITE}] Process with PID=${CYAN}$PID${WHITE}"
+			fi
+			KILL_IT="${KILL_IT%?}"
+		done
+	elif [[ $KILL_IT == *"-"* ]] && [[ $KILL_IT != *","* ]]; then
+		LAST="${KILL_IT: -1}"
+		KILL_IT="${KILL_IT%?}"
+		FIRST="${KILL_IT%?}"
+		if (( LAST < SERVICE_COUNT + 1 )) && (( LAST > 0 )) && (( FIRST < LAST )) && (( FIRST > 0 )); then
+			for (( i=FIRST; i<$(( LAST + 1 )) ; i++ ))
+			do
+				PID=$(ps -ef | grep "$SYNC_SCRIPT_location -d ${GIT_FOLDER[$((i - 1))]}" | awk "NR==1{print \$2}")
+				kill "$PID"
+				echo -e "   [${RED}TERMINATED${WHITE}] Process with PID=${CYAN}$PID${WHITE}"
+			done
+		else
+			echo "${RED}[!]${WHITE}Are you blind? That's an invalid range of running processes ¯\_(ツ)_/¯"
+		fi
+	elif [[ $RUN == *"-"* ]] && [[ $RUN == *","* ]]; then
+		echo -e "${RED}[!] ${WHITE}Use of both ',' and '-' together is not supported"
+		_EXIT_
+	else
+		if (( KILL_IT > SERVICE_COUNT )) || (( KILL_IT < 0 )); then
+			echo
+			echo "${RED}[!]${WHITE}Are you blind? There's no process corresponding to this index ¯\_(ツ)_/¯"
+			_EXIT_
+		elif [[ $KILL_IT == 0 ]]; then
+			_EXIT_
+		else
+			PID=$(ps -ef | grep "$SYNC_SCRIPT_location -d ${GIT_FOLDER[$((KILL_IT - 1))]}" | awk "NR==1{print \$2}")
+			kill "$PID"
+			echo -e "   [${RED}TERMINATED${WHITE}] Process with PID=${CYAN}$PID${WHITE}"
+		fi
+	fi
+	echo
+}
+
+service_selective_start() {
+	## Matching with entries in services script
+	SERVICE_COUNT=$(ps -ef | grep "$SYNC_SCRIPT_location" | awk '{print $2}' | grep "^" -c)
+	_=$(( SERVICE_COUNT = SERVICE_COUNT - 1 ))
+	ENTRY_COUNT=$(grep "$SERVICES_SCRIPT" -ce "-d")
+	echo
+	if [[ $SERVICE_COUNT == $ENTRY_COUNT ]]; then
+		echo "${YELLOW}[-] ${WHITE}All processes are running, nothing more for you to start"
+		_EXIT_
+	fi
+	echo -e "${GREEN}[+] ${YELLOW}Listing all stopped processes${WHITE}"
+	echo
+	_=$(( AINDEX = 7 ))
+	_=$(( PINDEX = 1 ))
+	ENTRY_FOUND=()
+	GIT_FOLDER=()
+	## initialising every element of entry_found with 0
+	for (( i=0; i<ENTRY_COUNT; i++ ))
+	do
+		ENTRY_FOUND[$i]=0
+	done
+	_=$(( k = 0 ))
+	for (( i=ENTRY_COUNT; i>0; i-- ))
+	do
+		ENTRY=$(awk "NR==${AINDEX}{print \$4}" "$SERVICES_SCRIPT")
+		_=$(( PINDEX = 1 ))
+		for (( j=SERVICE_COUNT; j>0; j-- ))
+		do
+			PROCESS=$(ps -ef | grep "$SYNC_SCRIPT_location" | awk "NR==${PINDEX}{print \$11}")
+			if [[ $ENTRY == "$PROCESS" ]]; then
+				_=$(( PINDEX = PINDEX + 1 ))
+				ENTRY_FOUND[$k]=1
+				break
+			else
+				if [[ $ENTRY != ${GIT_FOLDER[$k]} ]]; then
+					GIT_FOLDER[$k]=$ENTRY
+					_=$(( k = k + 1 ))
+				fi
+			fi
+			_=$(( PINDEX = PINDEX + 1 ))
+		done
+		_=$(( AINDEX = AINDEX + 1 ))
+	done
+	_=$(( j = 0 ))
+	for (( i=0; i<k; i++ ))
+	do
+		if [[ ${ENTRY_FOUND[$i]} == 0 ]]; then
+			echo -e "    ${CYAN}$((j + 1)))${WHITE} ${GIT_FOLDER[$i]}"
+			_=$(( j = j + 1 ))
+		fi
+	done
+	echo 
+	echo "${CYAN}0)${WHITE} exit"
+	echo
+	read -rp "${GREEN}[^]${YELLOW} Enter the number corresponding to the process [${WHITE}use ',' for separate and '-' for contnuous values${YELLOW}]: ${WHITE}" RUN
+
+	STOPPED_COUNT=$(( ENTRY_COUNT - SERVICE_COUNT ))
+	echo
+	if [[ $RUN == *","* ]] && [[ $RUN != *"-"* ]]; then
+		NUMBER="${RUN: -1}"
+		if (( NUMBER < STOPPED_COUNT + 1 )) && (( NUMBER > 0 )); then
+			FOLDER_NAME=${GIT_FOLDER[$(( RUN - 1 ))]##*/}
+			nohup "$SYNC_SCRIPT_location" -d "${GIT_FOLDER[$(( RUN - 1 ))]}" > "$SCRIPT_LOCATION"/lib/logs/"$FOLDER_NAME".log &
+			echo -e "   [${GREEN}STARTED${WHITE}] Sync process for ${CYAN}${GIT_FOLDER[$(( RUN - 1 ))]}${WHITE}"
+		fi
+		RUN="${RUN%?}"
+		while [[ $RUN != "" ]]
+		do
+			RUN="${RUN%?}"
+			NUMBER="${RUN: -1}"
+			if (( NUMBER < STOPPED_COUNT + 1 )) && (( NUMBER > 0 )); then
+				FOLDER_NAME=${GIT_FOLDER[$(( RUN - 1 ))]##*/}
+				nohup "$SYNC_SCRIPT_location" -d "${GIT_FOLDER[$(( RUN - 1 ))]}" > "$SCRIPT_LOCATION"/lib/logs/"$FOLDER_NAME".log &
+				echo -e "   [${GREEN}STARTED${WHITE}] Sync process for ${CYAN}${GIT_FOLDER[$(( RUN - 1 ))]}${WHITE}"
+			fi
+			RUN="${RUN%?}"
+		done
+	elif [[ $RUN == *"-"* ]] && [[ $RUN != *","* ]]; then
+		LAST="${RUN: -1}"
+		RUN="${RUN%?}"
+		FIRST="${RUN%?}"
+		if (( LAST < STOPPED_COUNT + 1 )) && (( LAST > 0 )) && (( FIRST < LAST )) && (( FIRST > 0 )); then
+			for (( i=FIRST; i<$(( LAST + 1 )) ; i++ ))
+			do
+				FOLDER_NAME=${GIT_FOLDER[$(( i - 1 ))]##*/}
+				nohup "$SYNC_SCRIPT_location" -d "${GIT_FOLDER[$(( i - 1 ))]}" > "$SCRIPT_LOCATION"/lib/logs/"$FOLDER_NAME".log &
+				echo -e "   [${GREEN}STARTED${WHITE}] Sync process for ${CYAN}${GIT_FOLDER[$(( i - 1 ))]}${WHITE}"
+			done
+		else
+			echo "${RED}[!]${WHITE}Are you blind? That's an invalid range of stopped processes ¯\_(ツ)_/¯"
+		fi
+	elif [[ $RUN == *"-"* ]] && [[ $RUN == *","* ]]; then
+		echo -e "${RED}[!] ${WHITE}Use of both ',' and '-' together is not supported"
+		_EXIT_
+	else
+		if (( RUN > STOPPED_COUNT )) || (( RUN < 0 )); then
+			echo "${RED}[!]${WHITE}Are you blind? There's no process corresponding to this index ¯\_(ツ)_/¯"
+			_EXIT_
+		elif [[ $RUN == 0 ]]; then
+			_EXIT_
+		else
+			FOLDER_NAME=${GIT_FOLDER[$(( RUN - 1 ))]##*/}
+			nohup "$SYNC_SCRIPT_location" -d "${GIT_FOLDER[$(( RUN - 1 ))]}" > "$SCRIPT_LOCATION"/lib/logs/"$FOLDER_NAME".log &
+			echo -e "   [${GREEN}STARTED${WHITE}] Sync process for ${CYAN}${GIT_FOLDER[$(( RUN - 1 ))]}${WHITE}"
 		fi
 	fi
 	echo
