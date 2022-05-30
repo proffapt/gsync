@@ -38,18 +38,20 @@ ${BLUE}LOGS MANAGEMENT:${WHITE}
 $(basename "$0") [${ORANGE}logs${WHITE}/${ORANGE}clear-logs${WHITE}] [${RED}-c${WHITE} ${CYAN}<path_to_config_file>${WHITE}]
 
 ${BLUE}SERVICE MANAGEMENT:${WHITE}
-$(basename "$0") [${ORANGE}start${WHITE}/${ORANGE}stop${WHITE}/${ORANGE}restart${WHITE}/${ORANGE}status${WHITE}]
+$(basename "$0") [${ORANGE}start${WHITE}/${ORANGE}stop${WHITE}/${ORANGE}restart${WHITE}/${ORANGE}status${WHITE}/${ORANGE}enable${WHITE}/${ORANGE}disable${WHITE}]
 
 ${BLUE}where:${WHITE}
     ${RED}create${WHITE}  : Mode to setup auto-syncing
     ${RED}delete${WHITE}  : Mode to revert everything back to original state
     ${RED}default${WHITE} : Mode to store default value(s) for ${ORANGE}-g${WHITE} arg(s)
-    ${RED}logs${WHITE} : Mode to view logs of files being synced through gsync
-    ${RED}clear-logs${WHITE} : Clears log file for configuration file specified with ${ORANGE}-c${WHITE} arg
-    ${RED}start${WHITE} : Mode to start background service for monitoring changes
-    ${RED}stop${WHITE} : Mode to stop background services which were monitoring for changes
-    ${RED}restart${WHITE} : Mode to restart monitoring services
-    ${RED}status${WHITE} : Mode to show status of running services, if any
+    ${RED}logs${WHITE} : See logs of folders being synced through gsync
+    ${RED}clear-logs${WHITE} : Clears logs for folders getting synced specified with ${ORANGE}-g${WHITE} arg
+    ${RED}start${WHITE} : Starts background services for monitoring changes
+    ${RED}stop${WHITE} : Stops background services which were monitoring for changes
+    ${RED}enable${WHITE} : Enables autostarting of syncing services on user login
+    ${RED}disable${WHITE} : Disables autostarting of syncing services on user login
+    ${RED}restart${WHITE} : Restarts monitoring services
+    ${RED}status${WHITE} : Shows status of running services, if any
 
     ${RED}-c${WHITE} : Specify path of configuration file
     ${RED}-g${WHITE} : Specify path of dir which will be used as github's main dir for syncing

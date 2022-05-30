@@ -15,7 +15,8 @@
 #                  License: BSD License 2.0                                                                   #
 #                  Note: If You find any bugs in gsync, please REPORT it to me                                #
 #                  by creating an Issue; Or if you have a fix, create a Pull Request.                         #
-#                                                                                                             # ###############################################################################################################
+#                                                                                                             # 
+###############################################################################################################
 
 ## Sourcing other script files
 # <start>
@@ -138,6 +139,14 @@ elif [[ "$MODE" == "restart" ]]; then
 ## For outputting status of the services
 elif [[ "$MODE" == "status" ]]; then
 	service_status
+
+## For enabling the startup service on login
+elif [[ "$MODE" == "enable" ]]; then
+	service_enable
+
+## For disabling the startup service on login
+elif [[ "$MODE" == "disable" ]]; then
+	service_disable
 
 ## The fuck you saying?
 else

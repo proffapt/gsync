@@ -124,4 +124,118 @@ service_restart(){
 	service_stop
 	service_start
 }
+
+service_enable() {
+		## implementing logic for executing the startup script on every login
+		if [[ $KERNEL == "Darwin" ]]; then
+			## giving /bin/bash full disk access if not given already
+			BINBASH_CHECK=$(sqlite3 /Library/Application\ Support/com.apple.TCC/TCC.db 'select client from access where auth_value and service = "kTCCServiceSystemPolicyAllFiles"' | grep -iq "/bin/bash" && echo 1)
+			if [[ $BINBASH_CHECK != 1 ]]; then
+				clear
+				echo "${RED}[!] ${YELLOW}/bin/bash${CYAN} doesn't have ${YELLOW}Full Disk Access${CYAN} crucial for syncscript to start on login"
+				echo "
+				${RED}NOTE FROM THE DEVELOPER:${YELLOW}
+
+				Now don't cry for the fact that this script is asking you to do some clicks.. saying it was supposed to be fully automated process.
+				I can't help it, to automate the addition of this entry to FDA database via this script user needs to have SIP disabled,
+				which is not suggested in general and for those who don't even know what the actual fuck it is, just forget it.
+
+				This is a one time process, you won't be seeing this message again while using this script.. if you follow all the steps given below correctly.
+				"
+				echo "${GREEN}[+] ${BLUE}Follow the steps below to achieve the above task${WHITE}"
+
+				## printing out required steps (can't automate requires SIP disabled by default)
+				echo "
+				${YELLOW}1.${WHITE} System Preferences ${CYAN}->${WHITE} Security & Privacy ${CYAN}->${WHITE} Privacy ${CYAN}->${WHITE} Full Disk Access
+				${YELLOW}2.${WHITE} Click the '${GREEN}lock${WHITE}' in the lower left corner to allow changes
+				${YELLOW}3.${WHITE} Click on '${GREEN}+${WHITE}' button to open finder window
+				${YELLOW}4.${WHITE} Go to your ${ORANGE}root directory${WHITE} (named as Macintosh HD)
+				${YELLOW}5.${WHITE} Press '${CYAN}Cmd+Shift+.${WHITE}' key combination to show hidden files
+				${YELLOW}6.${WHITE} Go to ${ORANGE}bin${WHITE} folder and select ${ORANGE}bash${WHITE} inside it
+				${YELLOW}7.${WHITE} Click '${GREEN}open${WHITE}' on the bottom right corner to choose bash
+				${YELLOW}8.${WHITE} Close system Preferences.
+				"
+				read -rp "${CYAN}[^]${BLUE} Enter '${CYAN}proceed${BLUE}' to open System Preferences for you: ${WHITE}" PROCEED
+				if [[ $PROCEED != "proceed" ]]; then
+					echo "${RED}[!] ${WHITE}User denied to open System Preferences"
+					_EXIT_
+				else
+					open -a "System Preferences"
+					read -rp "${CYAN}[^]${BLUE} Enter '${CYAN}done${BLUE}' to proceed to next steps: ${WHITE}" DONE
+					if [[ $DONE != "done" ]]; then
+						echo "${RED}[!] ${WHITE}User did not complete the addition of ${YELLOW}/bin/bash${WHITE} to ${YELLOW}FDA database${WHITE}"
+						_EXIT_
+					fi
+				fi
+			fi
+
+
+			echo
+			if [[ ! -f ~/Library/LaunchAgents/com.gsync-startup.plist ]]; then
+				## Method used for starting the startup.sh script on login: LaunchAgent
+				cat <<- EOF > ~/Library/LaunchAgents/com.gsync-startup.plist
+					<?xml version="1.0" encoding="UTF-8"?>
+					<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+					<plist version="1.0">
+					<dict>
+						<key>KeepAlive</key>
+						<dict>
+							<key>Crashed</key>
+							<true/>
+							<key>SuccessfulExit</key>
+							<false/>
+						</dict>
+						<key>Label</key>
+						<string>com.gsyn-startup.app</string>
+						<key>LimitLoadToSessionType</key>
+						<string>Aqua</string>
+						<key>ProgramArguments</key>
+						<array>
+							<string>/bin/bash</string>
+							<string>$STARTUP_SCRIPT</string>
+						</array>
+						<key>RunAtLoad</key>
+						<true/>
+					</dict>
+					</plist>
+				EOF
+				if [[ $? == 0 ]]; then
+					echo -e "  STARTUP SERVICE: [${GREEN}ENABLED${WHITE}]"
+				else
+					echo -e "  STARTUP SERVICE: [${RED}DISABLED${WHITE}]"
+				fi
+			else
+				echo -e "  STARTUP SERVICE: [${GREEN}ENABLED${WHITE}]"
+			fi
+			echo
+		else
+			## Method used for starting the startup.sh script on login: /etc/profile.d
+			MODFIED=$(diff /etc/profile.d/gsync-startup.sh "$STARTUP_SCRIPT")
+			echo
+			if [[ $MODFIED != "" ]]; then
+				cp "$STARTUP_SCRIPT" /etc/profile.d/gsync-startup.sh && echo -e "  STARTUP SERVICE: [${GREEN}ENABLED${WHITE}]" || echo -e "  STARTUP SERVICE: [${RED}DISABLED${WHITE}]"
+			else
+				echo -e "  STARTUP SERVICE: [${GREEN}ENABLED${WHITE}]"
+			fi
+			echo
+		fi
+}
+
+service_disable() {
+	echo
+	if [[ $KERNEL == "Darwin" ]]; then
+		if [[ -f ~/Library/LaunchAgents/com.gsync-startup.plist ]]; then
+			rm -f ~/Library/LaunchAgents/com.gsync-startup.plist && echo -e "  STARTUP SERVICE: [${RED}DISABLED${WHITE}]" || echo -e "  STARTUP SERVICE: [${GREEN}ENABLED${WHITE}]"
+		else
+			echo -e "  STARTUP SERVICE: [${RED}DISABLED${WHITE}]"
+		fi
+	else
+		if [[ -f /etc/parofile.d/gsync-startup.sh ]]; then
+			rm -f /etc/profile.d/gsync-startup.sh && echo -e "  STARTUP SERVICE: [${RED}DISABLED${WHITE}]" || echo -e "  STARTUP SERVICE: [${GREEN}ENABLED${WHITE}]"
+		else
+			echo -e "  STARTUP SERVICE: [${RED}DISABLED${WHITE}]"
+		fi
+	fi
+	echo
+}
 #</start>
