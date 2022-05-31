@@ -396,54 +396,73 @@ service_selective_start() {
 	_=$(( PINDEX = 1 ))
 	ENTRY_FOUND=()
 	GIT_FOLDER=()
-	## initialising every element of entry_found with 0
-	for (( i=0; i<ENTRY_COUNT; i++ ))
-	do
-		ENTRY_FOUND[$i]=0
-	done
+	COUNT=()
+	LIST_FOLDERS=()
 	_=$(( k = 0 ))
-	for (( i=ENTRY_COUNT; i>0; i-- ))
-	do
-		ENTRY=$(awk "NR==${AINDEX}{print \$4}" "$SERVICES_SCRIPT")
-		_=$(( PINDEX = 1 ))
-		for (( j=SERVICE_COUNT; j>0; j-- ))
+	if [[ $SERVICE_COUNT != 0 ]]; then
+		for (( i=ENTRY_COUNT; i>0; i-- ))
 		do
-			PROCESS=$(ps -ef | grep "$SYNC_SCRIPT_location" | awk "NR==${PINDEX}{print \$11}")
-			if [[ $ENTRY == "$PROCESS" ]]; then
-				_=$(( PINDEX = PINDEX + 1 ))
-				ENTRY_FOUND[$k]=1
-				break
-			else
-				if [[ $ENTRY != ${GIT_FOLDER[$k]} ]]; then
+			ENTRY=$(awk "NR==${AINDEX}{print \$4}" "$SERVICES_SCRIPT")
+			_=$(( PINDEX = 1 ))
+			for (( j=SERVICE_COUNT; j>0; j-- ))
+			do
+				PROCESS=$(ps -ef | grep "$SYNC_SCRIPT_location" | awk "NR==${PINDEX}{print \$11}")
+				if [[ $ENTRY == "$PROCESS" ]]; then
+					ENTRY_FOUND[$k]=1
+					_=$(( PINDEX = PINDEX + 1 ))
+					break
+				else
 					GIT_FOLDER[$k]=$ENTRY
-					_=$(( k = k + 1 ))
+					_=$(( COUNT[$k] = COUNT[$k] + 1 ))
+					ENTRY_FOUND[$k]=0
+					_=$(( PINDEX = PINDEX + 1 ))
 				fi
-			fi
-			_=$(( PINDEX = PINDEX + 1 ))
+			done
+			_=$(( k = k + 1 ))
+			_=$(( AINDEX = AINDEX + 1 ))
 		done
-		_=$(( AINDEX = AINDEX + 1 ))
-	done
-	_=$(( j = 0 ))
-	for (( i=0; i<k; i++ ))
+	else
+		for (( i=ENTRY_COUNT; i>0; i-- ))
+		do
+			ENTRY=$(awk "NR==${AINDEX}{print \$4}" "$SERVICES_SCRIPT")
+			GIT_FOLDER[$k]=$ENTRY
+			_=$(( k = k + 1 ))
+			_=$(( AINDEX = AINDEX + 1 ))
+		done
+	fi
+	## recreating array
+	_=$(( q = 0 ))
+	for ((i=0;i<k;i++))
 	do
-		if [[ ${ENTRY_FOUND[$i]} == 0 ]]; then
-			echo -e "    ${CYAN}$((j + 1)))${WHITE} ${GIT_FOLDER[$i]}"
-			_=$(( j = j + 1 ))
+		if [[ ${COUNT[$i]} == "" ]]; then
+			COUNT[$i]=0
 		fi
+		if [[ ${COUNT[$i]} == "$SERVICE_COUNT" ]]; then
+			LIST_FOLDERS[$q]="${GIT_FOLDER[$i]}"
+			_=$(( q = q + 1 ))
+		fi
+	done
+	## printing the menu
+	_=$(( j = 0 ))
+	for (( i=0; i<q; i++ ))
+	do
+		echo -e "    ${CYAN}$((j + 1)))${WHITE} ${LIST_FOLDERS[$i]}"
+		_=$(( j = j + 1 ))
 	done
 	echo 
 	echo "${CYAN}0)${WHITE} exit"
 	echo
 	read -rp "${GREEN}[^]${YELLOW} Enter the number corresponding to the process [${WHITE}use ',' for separate and '-' for contnuous values${YELLOW}]: ${WHITE}" RUN
 
+
 	STOPPED_COUNT=$(( ENTRY_COUNT - SERVICE_COUNT ))
 	echo
 	if [[ $RUN == *","* ]] && [[ $RUN != *"-"* ]]; then
 		NUMBER="${RUN: -1}"
 		if (( NUMBER < STOPPED_COUNT + 1 )) && (( NUMBER > 0 )); then
-			FOLDER_NAME=${GIT_FOLDER[$(( RUN - 1 ))]##*/}
-			nohup "$SYNC_SCRIPT_location" -d "${GIT_FOLDER[$(( RUN - 1 ))]}" > "$SCRIPT_LOCATION"/lib/logs/"$FOLDER_NAME".log &
-			echo -e "   [${GREEN}STARTED${WHITE}] Sync process for ${CYAN}${GIT_FOLDER[$(( RUN - 1 ))]}${WHITE}"
+			FOLDER_NAME=${LIST_FOLDERS[$(( RUN - 1 ))]##*/}
+			nohup "$SYNC_SCRIPT_location" -d "${LIST_FOLDERS[$(( RUN - 1 ))]}" > "$SCRIPT_LOCATION"/lib/logs/"$FOLDER_NAME".log &
+			echo -e "   [${GREEN}STARTED${WHITE}] Sync process for ${CYAN}${LIST_FOLDERS[$(( RUN - 1 ))]}${WHITE}"
 		fi
 		RUN="${RUN%?}"
 		while [[ $RUN != "" ]]
@@ -451,9 +470,9 @@ service_selective_start() {
 			RUN="${RUN%?}"
 			NUMBER="${RUN: -1}"
 			if (( NUMBER < STOPPED_COUNT + 1 )) && (( NUMBER > 0 )); then
-				FOLDER_NAME=${GIT_FOLDER[$(( RUN - 1 ))]##*/}
-				nohup "$SYNC_SCRIPT_location" -d "${GIT_FOLDER[$(( RUN - 1 ))]}" > "$SCRIPT_LOCATION"/lib/logs/"$FOLDER_NAME".log &
-				echo -e "   [${GREEN}STARTED${WHITE}] Sync process for ${CYAN}${GIT_FOLDER[$(( RUN - 1 ))]}${WHITE}"
+				FOLDER_NAME=${LIST_FOLDERS[$(( RUN - 1 ))]##*/}
+				nohup "$SYNC_SCRIPT_location" -d "${LIST_FOLDERS[$(( RUN - 1 ))]}" > "$SCRIPT_LOCATION"/lib/logs/"$FOLDER_NAME".log &
+				echo -e "   [${GREEN}STARTED${WHITE}] Sync process for ${CYAN}${LIST_FOLDERS[$(( RUN - 1 ))]}${WHITE}"
 			fi
 			RUN="${RUN%?}"
 		done
@@ -464,9 +483,9 @@ service_selective_start() {
 		if (( LAST < STOPPED_COUNT + 1 )) && (( LAST > 0 )) && (( FIRST < LAST )) && (( FIRST > 0 )); then
 			for (( i=FIRST; i<$(( LAST + 1 )) ; i++ ))
 			do
-				FOLDER_NAME=${GIT_FOLDER[$(( i - 1 ))]##*/}
-				nohup "$SYNC_SCRIPT_location" -d "${GIT_FOLDER[$(( i - 1 ))]}" > "$SCRIPT_LOCATION"/lib/logs/"$FOLDER_NAME".log &
-				echo -e "   [${GREEN}STARTED${WHITE}] Sync process for ${CYAN}${GIT_FOLDER[$(( i - 1 ))]}${WHITE}"
+				FOLDER_NAME=${LIST_FOLDERS[$(( i - 1 ))]##*/}
+				nohup "$SYNC_SCRIPT_location" -d "${LIST_FOLDERS[$(( i - 1 ))]}" > "$SCRIPT_LOCATION"/lib/logs/"$FOLDER_NAME".log &
+				echo -e "   [${GREEN}STARTED${WHITE}] Sync process for ${CYAN}${LIST_FOLDERS[$(( i - 1 ))]}${WHITE}"
 			done
 		else
 			echo "${RED}[!]${WHITE}Are you blind? That's an invalid range of stopped processes ¯\_(ツ)_/¯"
@@ -481,9 +500,9 @@ service_selective_start() {
 		elif [[ $RUN == 0 ]]; then
 			_EXIT_
 		else
-			FOLDER_NAME=${GIT_FOLDER[$(( RUN - 1 ))]##*/}
-			nohup "$SYNC_SCRIPT_location" -d "${GIT_FOLDER[$(( RUN - 1 ))]}" > "$SCRIPT_LOCATION"/lib/logs/"$FOLDER_NAME".log &
-			echo -e "   [${GREEN}STARTED${WHITE}] Sync process for ${CYAN}${GIT_FOLDER[$(( RUN - 1 ))]}${WHITE}"
+			FOLDER_NAME=${LIST_FOLDERS[$(( RUN - 1 ))]##*/}
+			nohup "$SYNC_SCRIPT_location" -d "${LIST_FOLDERS[$(( RUN - 1 ))]}" > "$SCRIPT_LOCATION"/lib/logs/"$FOLDER_NAME".log &
+			echo -e "   [${GREEN}STARTED${WHITE}] Sync process for ${CYAN}${LIST_FOLDERS[$(( RUN - 1 ))]}${WHITE}"
 		fi
 	fi
 	echo

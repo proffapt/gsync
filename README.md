@@ -121,7 +121,7 @@ _Now since we are done with the setting up of environment suitable for the proje
    ```
 <div align="center">
   <a href="https://github.com/proffapt/gsync">
-    <img src="images/help_v1-2-1.png" alt="product screenshot">
+    <img src="images/help_v1-3.png" alt="product screenshot">
   </a>
 </div>
 
@@ -156,7 +156,9 @@ _Now since we are done with the setting up of environment suitable for the proje
 * Service management
    ```sh
    gsync start
+   gsync selective-start
    gsync stop
+   gsync selective-stop
    gsync restart
    gsync status
    gsync enable
@@ -191,10 +193,11 @@ Don't forget to give the project a star! Thanks again!
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
+
 <!-- Changelog -->
 # Changelog
 
-## v1.2.1
+## v1.3
 
 ### Added or Changed
 - Completely new and robust logic for syncing changes
@@ -204,6 +207,8 @@ Don't forget to give the project a star! Thanks again!
 - Support for automatically starting the monitoring process on login
 - Elaborative and colorful logs in a separate log-file, cleared on every login
 - Super convenient logs and process/service management
+- Service management is more binocular, supports starting and stopping of individual processes specified by user
+- Also included `enable` and `disable` modes for services
 
 ### Removed
 

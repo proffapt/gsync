@@ -1,7 +1,7 @@
 <!-- Changelog -->
 # Changelog
 
-## v1.2.1
+## v1.3
 
 ### Added or Changed
 - Completely new and robust logic for syncing changes
@@ -11,6 +11,8 @@
 - Support for automatically starting the monitoring process on login
 - Elaborative and colorful logs in a separate log-file, cleared on every login
 - Super convenient logs and process/service management
+- Service management is more binocular, supports starting and stopping of individual processes specified by user
+- Also included `enable` and `disable` modes for services
 
 ### Removed
 

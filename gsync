@@ -128,9 +128,17 @@ elif [[ "$MODE" == "clear-logs" ]]; then
 elif [[ "$MODE" == "start" ]]; then
 	service_start
 
+## For selectively starting the syncing services of all files
+elif [[ "$MODE" == "selective-start" ]]; then
+	service_selective_start
+
 ## For stoping the syncing services of all files
 elif [[ "$MODE" == "stop" ]]; then
 	service_stop
+
+## For selectively stoping the syncing services of all files
+elif [[ "$MODE" == "selective-stop" ]]; then
+	service_selective_stop
 
 ## For restarting the syncing services of all files
 elif [[ "$MODE" == "restart" ]]; then
