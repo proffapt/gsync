@@ -333,6 +333,8 @@ service_selective_stop() {
 		if (( NUMBER < SERVICE_COUNT + 1 )) && (( NUMBER > 0 )); then
 			PID=$(ps -ef | grep "$SYNC_SCRIPT_location -d ${GIT_FOLDER[$((KILL_IT - 1))]}" | awk "NR==1{print \$2}")
 			kill "$PID"
+			GIT_MAIN_FOLDER="${GIT_FOLDER[$(( KILL_IT - 1 ))]##*/}"
+			echo "[${YELLOW}$(date)${WHITE}] [${RED}KILL${WHITE}] Terminated process runnning on PID=${CYAN}$PID${WHITE}" >> "$SCRIPT_LOCATION"/lib/logs/"$GIT_MAIN_FOLDER".log
 			echo -e "   [${RED}TERMINATED${WHITE}] Process with PID=${CYAN}$PID${WHITE}"
 		fi
 		KILL_IT="${KILL_IT%?}"
@@ -343,6 +345,8 @@ service_selective_stop() {
 			if (( NUMBER < SERVICE_COUNT + 1 )) && (( NUMBER > 0 )); then
 				PID=$(ps -ef | grep "$SYNC_SCRIPT_location -d ${GIT_FOLDER[$((KILL_IT - 1))]}" | awk "NR==1{print \$2}")
 				kill "$PID"
+				GIT_MAIN_FOLDER="${GIT_FOLDER[$(( KILL_IT - 1 ))]##*/}"
+				echo "[${YELLOW}$(date)${WHITE}] [${RED}KILL${WHITE}] Terminated process runnning on PID=${CYAN}$PID${WHITE}" >> "$SCRIPT_LOCATION"/lib/logs/"$GIT_MAIN_FOLDER".log
 				echo -e "   [${RED}TERMINATED${WHITE}] Process with PID=${CYAN}$PID${WHITE}"
 			fi
 			KILL_IT="${KILL_IT%?}"
@@ -356,6 +360,8 @@ service_selective_stop() {
 			do
 				PID=$(ps -ef | grep "$SYNC_SCRIPT_location -d ${GIT_FOLDER[$((i - 1))]}" | awk "NR==1{print \$2}")
 				kill "$PID"
+				GIT_MAIN_FOLDER="${GIT_FOLDER[$(( KILL_IT - 1 ))]##*/}"
+				echo "[${YELLOW}$(date)${WHITE}] [${RED}KILL${WHITE}] Terminated process runnning on PID=${CYAN}$PID${WHITE}" >> "$SCRIPT_LOCATION"/lib/logs/"$GIT_MAIN_FOLDER".log
 				echo -e "   [${RED}TERMINATED${WHITE}] Process with PID=${CYAN}$PID${WHITE}"
 			done
 		else
@@ -374,6 +380,8 @@ service_selective_stop() {
 		else
 			PID=$(ps -ef | grep "$SYNC_SCRIPT_location -d ${GIT_FOLDER[$((KILL_IT - 1))]}" | awk "NR==1{print \$2}")
 			kill "$PID"
+			GIT_MAIN_FOLDER="${GIT_FOLDER[$(( KILL_IT - 1 ))]##*/}"
+			echo "[${YELLOW}$(date)${WHITE}] [${RED}KILL${WHITE}] Terminated process runnning on PID=${CYAN}$PID${WHITE}" >> "$SCRIPT_LOCATION"/lib/logs/"$GIT_MAIN_FOLDER".log
 			echo -e "   [${RED}TERMINATED${WHITE}] Process with PID=${CYAN}$PID${WHITE}"
 		fi
 	fi
