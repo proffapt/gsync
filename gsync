@@ -1,22 +1,17 @@
 #!/bin/bash
 
-###############################################################################################################
-#                                          gsync - (Github sync configurer)                                   #
-#  Automate the unique process(by proffapt) for syncing your config files from your local machine to github.  #
-#                                                                                                             #
-#         Author: Arpit Bhardwaj(proffapt)                                                                    #
-#         Twitter: @proffapt                                                                                  #
-#         Github: proffapt                                                                                    #
-#         Gitlab: proffapt                                                                                    #
-#         Telegram: @proffapt                                                                                 #
-#         Email: proffapt@protonmail.com                                                                      #
-#         Facebook: I Don't Want My Data To Be Available On DarkWeb lol                                       #
-#                                                                                                             #
-#                  License: BSD License 2.0                                                                   #
-#                  Note: If You find any bugs in gsync, please REPORT it to me                                #
-#                  by creating an Issue; Or if you have a fix, create a Pull Request.                         #
-#                                                                                                             # 
-###############################################################################################################
+#############################################################################################
+#                            gsync - (Github sync configurer)                               #
+#Automate the unique process for syncing your config files from your local machine to github#
+#                                                                                           #
+#    Author: Arpit Bhardwaj(proffapt)                                                       #
+#    Git(hub/lab): proffapt                                                                 #
+#    Twitter & Telegram: @proffapt                                                          #
+#    Email: proffapt@pm.me                                                                  #
+#                                                                                           #
+#           License: BSD License 2.0                                                        #
+#                                                                                           #
+#############################################################################################
 
 ## Sourcing other script files
 # <start>
