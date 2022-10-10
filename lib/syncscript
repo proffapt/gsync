@@ -1,83 +1,57 @@
 #!/bin/bash
 
 ## Colors
-
 RED=$(tput setaf 1)
 GREEN=$(tput setaf 2)
 YELLOW=$(tput setaf 3)
 CYAN=$(tput setaf 6)
 WHITE=$(tput setaf 7)
 
-# Getting input for the directory to monitor
-while [ $OPTIND -le "$#" ]; do
-	if getopts d: input; then
-		case "${input}" in
-
-		d) TARGETDIR=${OPTARG} ;;
-		*)
-			exit 0
-			;;
-		esac
-	else
-		script_args+=("${!OPTIND}")
-		((OPTIND++))
-	fi
+# Getting input for the monitoring directory
+while getopts 'd:' flag; do
+  case "${flag}" in
+	d) TARGETDIR=${OPTARG} ;;
+	*) exit 0 ;;
+  esac
 done
 
 set -e
 
-echo "${GREEN}[+] ${CYAN}DIRECTORY BEING MONITORED FOR CHANGES: ${YELLOW}$TARGETDIR${WHITE}"
-
-stderr() {
-	echo "$1" >&2
-}
-
-is_command() {
-	command -v "$1" &>/dev/null
-}
-
-if [ "$(uname)" != "Darwin" ]; then
-	# If you don't have default location then update the location for inotifywait binary
-	INW="/usr/bin/inotifywait"
+# Knitting out the monitoring command
+if [ "$(uname -s)" != "Darwin" ]; then
+	INW=$(which inotifywait || echo "inotifywait")
 	EVENTS="close_write,move,delete,create"
-	INCOMMAND="\"$INW\" -qr -e \"$EVENTS\" --exclude \"\.git\" \"$TARGETDIR\""
-
-	# Storing full path to other binaries being used
-	TO="/usr/bin/timeout"
-	GIT="/usr/bin/git"
+	INCOMMAND="\"$INW\" -qqr -e \"$EVENTS\" --exclude \"\.git\" \"$TARGETDIR\""
 else
-	# If not installed using brew then change the location for fswatch binary
-	INW="/opt/homebrew/bin/fswatch"
+	INW=$(which fswatch || echo "fswatch")
 	# 414 = MovedTo + MovedFrom + Renamed + Removed + Updated + Created
 	#                = 256 + 128+ 16 + 8 + 4 + 2
 	EVENTS="--event=414"
-	INCOMMAND="\"$INW\" --recursive \"$EVENTS\" --exclude \"\.git\" --one-event \"$TARGETDIR\""
-
-	# Storing full path to other binaries being used
-	TO="/opt/homebrew/bin/timeout"
-	GIT="/opt/homebrew/bin/git"
+	INCOMMAND="\"$INW\" --recursive \"$EVENTS\" --exclude \"\.git\" --one-event \"$TARGETDIR\" >/dev/null"
 fi
 
-for cmd in "$GIT" "$INW" "$TO"; do
-	# in OSX: `timeout` => brew install coreutils
-	# in OSX: `fswatch` => brew install fswatch
-	is_command "$cmd" || {
-		stderr "[${YELLOW}$(date)${WHITE}] [${RED}ERROR${WHITE}] Required command '$cmd' not found"
+# Storing full path to other binaries being used
+GIT=$(which git || echo "git")
+
+# Checking dependencies
+for cmd in "$GIT" "$INW"; do
+	if [[ $cmd != *"/"* ]]; then
+		echo "[${YELLOW}$(date)${WHITE}] [${RED}ERROR${WHITE}] Required command '$cmd' not found" >&2
 		exit 1
-	}
+	fi
 done
 
 cd "$TARGETDIR"
+echo "${GREEN}[+] ${CYAN}DIRECTORY BEING MONITORED FOR CHANGES: ${YELLOW}$TARGETDIR${WHITE}"
 echo "${GREEN}[+] ${CYAN}MONITORING COMMAND: ${YELLOW}$INCOMMAND${WHITE}"
 
 while true; do
-	# time used is in seconds
-	eval "$TO 60 $INCOMMAND" || true
-	STATUS=$(git status -s)
-	if [ -n "$STATUS" ]; then
-		echo "[${YELLOW}$(date)${WHITE}] [${CYAN}CHANGE DETECTED${WHITE}] Detected change(s) in the folder being monitored"
-		$GIT add . && echo "[${YELLOW}$(date)${WHITE}] [${GREEN}ADDED${WHITE}] Added the change(s) to staging area" || echo "[${YELLOW}$(date)${WHITE}] [${RED}ERROR${WHITE}] Failed to add the change(s) to staging area"
-		$GIT commit -m "updating via gsync-syncscript by @proffapt" && echo "[${YELLOW}$(date)${WHITE}] [${GREEN}COMMITTED${WHITE}] Successfully made commit for changed file(s)" || echo "[${YELLOW}$(date)${WHITE}] [${RED}ERROR${WHITE}] Failed to commit the change(s)"
-		$GIT push origin && echo "[${YELLOW}$(date)${WHITE}] [${GREEN}SYNCED${WHITE}] Successfully pushed change(s) to the repository" || echo "[${YELLOW}$(date)${WHITE}] [${RED}ERROR${WHITE}] Failed to push the change(s) to corresponding github repository"
+	STATUS="$(git status -s)"
+	if [[ -n "$STATUS" ]]; then
+		echo "[${YELLOW}$(date)${WHITE}]"
+		echo "[${CYAN}CHANGE DETECTED${WHITE}] $STATUS"
+		$GIT add . # Can't fail :)
+		$GIT commit -m "update" && echo "[${GREEN}COMMITTED${WHITE}]" || echo "[${YELLOW}$(date)${WHITE}] [${RED}ERROR${WHITE}] Failed to commit the changes"
+		$GIT push origin && echo "[${GREEN}PUSHED${WHITE}]" || echo "[${YELLOW}$(date)${WHITE}] [${RED}ERROR${WHITE}] Failed to push the changes"
 	fi
 done
