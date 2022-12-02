@@ -176,66 +176,30 @@ _Now since we are done with the setting up of environment suitable for the proje
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
-<!-- CONTRIBUTING -->
-## Contributing
-
-Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
-
-If you have a suggestion that would make this better, please fork the repo and create a pull request. You can also simply open an issue with the tag "enhancement".
-Don't forget to give the project a star! Thanks again!
-
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-<p align="right">(<a href="#top">back to top</a>)</p>
-
-
-<!-- Changelog -->
-# Changelog
-
-## v1.3
-
-### Added or Changed
-- Completely new and robust logic for syncing changes
-
-         - Can sync changes even when done with GUI and CLI, by any process
-         - Leaves no dangling process.
-- Support for automatically starting the monitoring process on login
-- Elaborative and colorful logs in a separate log-file, cleared on every login
-- Super convenient logs and process/service management
-- Service management is more binocular, supports starting and stopping of individual processes specified by user
-- Also included `enable` and `disable` modes for services
-
-### Removed
-
-- `-a` argument. No need for any alias now, edit however you want
-- Old one way method of editing and syncing files
-- Shell dependency
-
-<p align="right">(<a href="#top">back to top</a>)</p>
-
-<!-- LICENSE -->
-## License
-
-Distributed under the BSD-2-Clause License. See `LICENSE.txt` for more information.
-
-<p align="right">(<a href="#top">back to top</a>)</p>
-
-
 <!-- CONTACT -->
 ## Contact
 
-Arpit Bhardwaj - [Twitter](https://twitter.com/proffapt) - [Telegram](https://t.me/proffapt) - proffapt@protonmail.com
+<p>
+📫 Arpit Bhardwaj ( aka proffapt ) -   
 
-Company website: [Cybernity](https://cybernity.org) - [CybernityForum](https://cybernity.group)
-
-Project Link: [https://github.com/proffapt/gsync](https://github.com/proffapt/gsync)
+<a href="https://twitter.com/proffapt">
+  <img align="center" alt="proffapt's Twitter " width="22px" src="https://raw.githubusercontent.com/edent/SuperTinyIcons/master/images/svg/twitter.svg" />
+</a>
+<a href="https://t.me/proffapt">
+  <img align="center" alt="proffapt's Telegram" width="22px" src="https://raw.githubusercontent.com/edent/SuperTinyIcons/master/images/svg/telegram.svg" />
+</a>
+<a href="https://www.linkedin.com/in/proffapt/">
+  <img align="center" alt="proffapt's LinkedIn" width="22px" src="https://raw.githubusercontent.com/edent/SuperTinyIcons/master/images/svg/linkedin.svg" />
+</a> 
+<a href="mailto:proffapt@pm.me">
+  <img align="center" alt="proffapt's mail" width="22px" src="https://raw.githubusercontent.com/edent/SuperTinyIcons/master/images/svg/mail.svg" />
+</a> 
+<a href="https://cybernity.group">
+  <img align="center" alt="proffapt's forum for cybernity" width="22px" src="https://cybernity.group/uploads/default/original/1X/a8338f86bbbedd39701c85d5f32cf3d817c04c27.png" />
+</a> 
+</p>
 
 <p align="right">(<a href="#top">back to top</a>)</p>
-
 
 <!-- ACKNOWLEDGMENTS -->
 ## Acknowledgments
@@ -249,6 +213,15 @@ Project Link: [https://github.com/proffapt/gsync](https://github.com/proffapt/gs
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
+## Miscelleneous
+
+Do consider looking at other paradigms of this documentation
+  - [Change-logs](CHANGELOG.md)
+  - [License used](LICENSE.txt)
+  - [Code Of Conduct](CODE_OF_CONDUCT.md)
+  - [How to contribute?](CONTRIBUTING.md)
+
+<p align="right">(<a href="#top">back to top</a>)</p>
 
 <!-- MARKDOWN LINKS & IMAGES -->
 
