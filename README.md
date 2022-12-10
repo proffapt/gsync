@@ -76,6 +76,7 @@ To get a local copy up and running follow these simple steps.
 ### Prerequisites
 You will need to install the following dependencies for the project to work.
 * `fswatch` for macOS; `inotify-tools` for GNU+Linux
+* `coreutils`
 * `git`
   ```sh
   git config pull.rebase true
