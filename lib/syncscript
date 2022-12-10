@@ -31,6 +31,7 @@ else
 fi
 
 # Storing full path to other binaries being used
+TO=$(which timeout || echo "timeout")
 GIT=$(which git || echo "git")
 
 # Checking dependencies
@@ -46,6 +47,8 @@ echo "${GREEN}[+] ${CYAN}DIRECTORY BEING MONITORED FOR CHANGES: ${YELLOW}$TARGET
 echo "${GREEN}[+] ${CYAN}MONITORING COMMAND: ${YELLOW}$INCOMMAND${WHITE}"
 
 while true; do
+	# time is in seconds
+	eval "$TO 600 $INCOMMAND" || true
 	STATUS="$(git status -s)"
 	if [[ -n "$STATUS" ]]; then
 		echo "[${YELLOW}$(date)${WHITE}]"

@@ -1,7 +1,7 @@
 <!-- Changelog -->
 # Changelog
 
-## v1.3
+## v1.3.1
 
 ### Added or Changed
 - Completely new and robust logic for syncing changes
@@ -13,6 +13,7 @@
 - Super convenient logs and process/service management
 - Service management is more binocular, supports starting and stopping of individual processes specified by user
 - Also included `enable` and `disable` modes for services
+- fixed excess battery drain issue in v1.3
 
 ### Removed
 
