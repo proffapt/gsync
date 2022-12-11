@@ -173,7 +173,7 @@ configure_syncsript() {
 		fi
 		## adds the syncing command entry to that services file
 		echo -e "${GREEN}[+] ${BLUE}Adding command entry to services script${WHITE}"
-		echo "nohup $SYNC_SCRIPT_location -d $GIT_MAIN_FOLDER_location > ${SCRIPT_LOCATION}/lib/logs/${GIT_MAIN_FOLDER}.log 2>/dev/null &" >> "$SERVICES_SCRIPT"
+		echo "nohup $SYNC_SCRIPT_location -d $GIT_MAIN_FOLDER_location > ${SCRIPT_LOCATION}/lib/logs/${GIT_MAIN_FOLDER}.log &" >> "$SERVICES_SCRIPT"
 
 		## handling previously running instances of the entry if any
 		PROCESS_COUNT=$(ps -ef | grep "$SYNC_SCRIPT_location -d $GIT_MAIN_FOLDER_location" | awk '{print $2}' | grep "^" -c)
