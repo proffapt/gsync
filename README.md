@@ -1,5 +1,7 @@
 <div id="top"></div>
 
+> **Note** I have lost interest in bash at this point of time, been doing this too much that it has become toxic for my health and career, so this project is being discontinued from my side. And, this project was a fun project - rather use [cronjobs](https://www.redhat.com/sysadmin/linux-cron-command) to achieve what it was doing `¯\_(ツ)_/¯`. It won't have all the logs and service like features but those aren't needed anyways, if they are anyhow then you always have this tool available right here.
+
 <!-- PROJECT SHIELDS -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links-->
 [![Contributors][contributors-shield]][contributors-url]
